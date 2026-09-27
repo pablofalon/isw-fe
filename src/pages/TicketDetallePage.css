@@ -1,0 +1,317 @@
+.ticket-detalle-back {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ticket-detalle-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ticket-detalle-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ticket-detalle-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.ticket-detalle-reabrir-btn {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 6px;
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ticket-detalle-reabrir-btn:hover {
+  background: var(--color-danger-hover);
+}
+
+.ticket-detalle-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .ticket-detalle-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ticket-detalle-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.ticket-detalle-card {
+  background: var(--color-card);
+  padding: 24px;
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+}
+
+.ticket-detalle-titulo {
+  margin: 0;
+  font-size: 16px;
+}
+
+.ticket-detalle-card h4 {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 20px 0 8px 0;
+}
+
+.ticket-detalle-meta {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  margin: 6px 0 0 0;
+}
+
+.ticket-detalle-descripcion {
+  white-space: pre-wrap;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.ticket-detalle-adjuntos ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ticket-detalle-adjuntos li {
+  display: flex;
+  justify-content: space-between;
+  background: #f8fafc;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.ticket-detalle-adjunto-tamanio {
+  color: var(--color-text-muted);
+}
+
+.ticket-detalle-solucion p {
+  margin: 0;
+  color: var(--color-text);
+  white-space: pre-wrap;
+}
+
+.ticket-detalle-error {
+  color: var(--color-danger-text);
+}
+
+.ticket-detalle-accion-simple button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ticket-detalle-accion-simple button:hover {
+  background: var(--color-primary-hover);
+}
+
+.ticket-detalle-validacion {
+  background: var(--color-card);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+}
+
+.ticket-detalle-validacion-pregunta {
+  margin: 0 0 14px 0;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.ticket-detalle-validacion-opciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 480px) {
+  .ticket-detalle-validacion-opciones {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ticket-detalle-validacion-opciones button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 18px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: #fff;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.ticket-detalle-validacion-opciones span {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.ticket-detalle-validacion-opciones small {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.ticket-detalle-validacion-confirmar {
+  color: var(--color-success);
+}
+
+.ticket-detalle-validacion-confirmar span {
+  color: var(--color-text);
+}
+
+.ticket-detalle-validacion-confirmar:hover {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.ticket-detalle-validacion-rechazar {
+  color: var(--color-danger);
+}
+
+.ticket-detalle-validacion-rechazar span {
+  color: var(--color-text);
+}
+
+.ticket-detalle-validacion-rechazar:hover {
+  border-color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+.ticket-detalle-info {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+  padding: 14px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.panel-operador {
+  background: var(--color-card);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.panel-operador h4 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+}
+
+.panel-operador p {
+  margin: 0 0 4px 0;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.panel-operador-hint {
+  background: #f8fafc;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.panel-operador-hint strong {
+  color: var(--color-text);
+}
+
+.panel-operador label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-top: 6px;
+}
+
+.panel-operador input,
+.panel-operador select,
+.panel-operador textarea {
+  padding: 9px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  width: 100%;
+}
+
+.panel-operador-fila {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.panel-operador-fila select {
+  flex: 1;
+}
+
+.panel-operador button {
+  padding: 9px 16px;
+  border: none;
+  border-radius: 6px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.panel-operador button:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.panel-operador button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.panel-operador-validacion {
+  margin-top: 8px;
+}
+
+.panel-operador-validar {
+  background: var(--color-success) !important;
+}
+
+.panel-operador-incompleto {
+  background: var(--color-danger) !important;
+}

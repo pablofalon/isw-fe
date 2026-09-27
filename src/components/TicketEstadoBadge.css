@@ -1,0 +1,42 @@
+.estado-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.estado-nuevo {
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.estado-pendiente_correccion {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.estado-validado {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.estado-en_analisis {
+  background: var(--color-primary-bg);
+  color: var(--color-primary-hover);
+}
+
+.estado-resuelto {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.estado-cerrado {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.estado-reabierto {
+  background: #f3e8ff;
+  color: #6b21a8;
+}

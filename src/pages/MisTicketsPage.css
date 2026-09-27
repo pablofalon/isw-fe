@@ -1,0 +1,75 @@
+.mis-tickets-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.mis-tickets-header h2 {
+  margin: 0;
+}
+
+.mis-tickets-nuevo {
+  padding: 9px 16px;
+  border-radius: 6px;
+  background: var(--color-primary);
+  color: #fff;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mis-tickets-nuevo:hover {
+  background: var(--color-primary-hover);
+}
+
+.mis-tickets-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-card);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.mis-tickets-table th,
+.mis-tickets-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 14px;
+}
+
+.mis-tickets-table tr:last-child td {
+  border-bottom: none;
+}
+
+.mis-tickets-table th {
+  background: #f8fafc;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.mis-tickets-table a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.mis-tickets-empty {
+  text-align: center;
+  padding: 48px 0;
+  color: var(--color-text-muted);
+}
+
+.mis-tickets-empty a {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--color-primary);
+}
+
+.mis-tickets-error {
+  color: var(--color-danger-text);
+}

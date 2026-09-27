@@ -1,0 +1,71 @@
+.bandeja-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 16px 0 20px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.bandeja-tab {
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font-family: inherit;
+}
+
+.bandeja-tab:hover {
+  color: var(--color-text);
+}
+
+.bandeja-tab-active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.bandeja-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-card);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.bandeja-table th,
+.bandeja-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 13px;
+}
+
+.bandeja-table tr:last-child td {
+  border-bottom: none;
+}
+
+.bandeja-table th {
+  background: #f8fafc;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.bandeja-table a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.bandeja-vacio {
+  color: var(--color-text-muted);
+  padding: 24px 0;
+}
+
+.bandeja-error {
+  color: var(--color-danger-text);
+}
