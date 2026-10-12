@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import * as authApi from '../api/auth';
 import { ApiError } from '../api/http';
-import type { Rol } from '../types/auth';
+import type { Permiso, Rol } from '../types/auth';
 
 const STORAGE_KEY = 'sistematicket.session';
 
@@ -9,13 +9,20 @@ interface StoredSession {
   token: string;
   rol: Rol;
   nombreCompleto: string;
+  permisos: Permiso[];
+  debeCambiarPassword: boolean;
 }
 
 interface AuthContextValue {
   token: string | null;
   rol: Rol | null;
   nombreCompleto: string | null;
+  permisos: Permiso[];
+  /** La UI decide qué mostrar por permiso, igual que el backend decide qué autorizar. */
+  tienePermiso: (permiso: Permiso) => boolean;
   isAuthenticated: boolean;
+  debeCambiarPassword: boolean;
+  marcarPasswordCambiada: () => void;
   login: (usuarioLogin: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -26,7 +33,9 @@ function readStoredSession(): StoredSession | null {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return null;
   try {
-    return JSON.parse(raw) as StoredSession;
+    const session = JSON.parse(raw) as StoredSession;
+    // Sesiones guardadas antes del módulo de permisos: se descartan para forzar un login nuevo.
+    return Array.isArray(session.permisos) ? session : null;
   } catch {
     return null;
   }
@@ -44,8 +53,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [session]);
 
   async function login(usuarioLogin: string, password: string) {
-    const { token, rol, nombreCompleto } = await authApi.login({ usuarioLogin, password });
-    setSession({ token, rol, nombreCompleto });
+    const { token, rol, nombreCompleto, permisos, debeCambiarPassword } = await authApi.login({ usuarioLogin, password });
+    setSession({ token, rol, nombreCompleto, permisos, debeCambiarPassword });
   }
 
   async function logout() {
@@ -63,7 +72,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     token: session?.token ?? null,
     rol: session?.rol ?? null,
     nombreCompleto: session?.nombreCompleto ?? null,
+    permisos: session?.permisos ?? [],
+    tienePermiso: (permiso) => session?.permisos.includes(permiso) ?? false,
     isAuthenticated: session !== null,
+    debeCambiarPassword: session?.debeCambiarPassword ?? false,
+    marcarPasswordCambiada: () => setSession((actual) => (actual ? { ...actual, debeCambiarPassword: false } : actual)),
     login,
     logout,
   };

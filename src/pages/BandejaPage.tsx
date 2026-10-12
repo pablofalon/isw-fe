@@ -2,21 +2,23 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { asignadosAMi, pendientesClasificacion, sinAsignar } from '../api/tickets';
+import type { Permiso } from '../types/auth';
 import type { Ticket } from '../types/ticket';
 import { TicketEstadoBadge } from '../components/TicketEstadoBadge';
 import './BandejaPage.css';
 
 type Tab = 'pendientes' | 'sin-asignar' | 'mios';
 
-const TABS: { id: Tab; label: string }[] = [
-  { id: 'pendientes', label: 'Pendientes de clasificación' },
-  { id: 'sin-asignar', label: 'Sin asignar' },
-  { id: 'mios', label: 'Asignados a mí' },
+const TABS: { id: Tab; label: string; permiso: Permiso }[] = [
+  { id: 'pendientes', label: 'Pendientes de clasificación', permiso: 'TICKET_CLASIFICAR' },
+  { id: 'sin-asignar', label: 'Sin asignar', permiso: 'TICKET_ASIGNAR' },
+  { id: 'mios', label: 'Asignados a mí', permiso: 'TICKET_RESOLVER' },
 ];
 
 export function BandejaPage() {
-  const { token } = useAuth();
-  const [tab, setTab] = useState<Tab>('pendientes');
+  const { token, tienePermiso } = useAuth();
+  const tabs = TABS.filter((t) => tienePermiso(t.permiso));
+  const [tab, setTab] = useState<Tab>(tabs[0]?.id ?? 'pendientes');
   const [tickets, setTickets] = useState<Ticket[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +35,7 @@ export function BandejaPage() {
     <div>
       <h2>Bandeja de operador</h2>
       <div className="bandeja-tabs">
-        {TABS.map((t) => (
+        {tabs.map((t) => (
           <button
             key={t.id}
             type="button"

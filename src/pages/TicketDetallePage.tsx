@@ -31,7 +31,7 @@ function numeroTicket(id: number): string {
 
 export function TicketDetallePage() {
   const { id } = useParams<{ id: string }>();
-  const { token, rol } = useAuth();
+  const { token, tienePermiso } = useAuth();
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [accionError, setAccionError] = useState<string | null>(null);
@@ -42,8 +42,9 @@ export function TicketDetallePage() {
   const [operadores, setOperadores] = useState<OperadorResumen[]>([]);
 
   const ticketId = Number(id);
-  const esOperativo = rol === 'OPERADOR' || rol === 'ADMINISTRADOR';
-  const esUsuario = rol === 'USUARIO';
+  const puedeClasificar = tienePermiso('TICKET_CLASIFICAR');
+  const puedeAsignar = tienePermiso('TICKET_ASIGNAR');
+  const puedeResolver = tienePermiso('TICKET_RESOLVER');
 
   function cargar() {
     obtenerTicket(token!, ticketId)
@@ -60,11 +61,14 @@ export function TicketDetallePage() {
   useEffect(cargar, [token, ticketId]);
 
   useEffect(() => {
-    if (!esOperativo) return;
-    listarCategorias(token!).then(setCategorias).catch(() => setCategorias([]));
-    listarPrioridades(token!).then(setPrioridades).catch(() => setPrioridades([]));
-    listarOperadores(token!).then(setOperadores).catch(() => setOperadores([]));
-  }, [token, esOperativo]);
+    if (puedeClasificar) {
+      listarCategorias(token!).then(setCategorias).catch(() => setCategorias([]));
+      listarPrioridades(token!).then(setPrioridades).catch(() => setPrioridades([]));
+    }
+    if (puedeAsignar) {
+      listarOperadores(token!).then(setOperadores).catch(() => setOperadores([]));
+    }
+  }, [token, puedeClasificar, puedeAsignar]);
 
   if (error) {
     return (
@@ -104,7 +108,7 @@ export function TicketDetallePage() {
           <h2>Ticket #{numeroTicket(ticket.id)}</h2>
           <TicketEstadoBadge estado={ticket.estado} />
         </div>
-        {esOperativo && ticket.operador && ticket.estado === 'CERRADO' && (
+        {tienePermiso('TICKET_REABRIR_OPERATIVO') && ticket.operador && ticket.estado === 'CERRADO' && (
           <button type="button" className="ticket-detalle-reabrir-btn" onClick={() => setModalReabrir(true)}>
             Reabrir Ticket
           </button>
@@ -167,7 +171,7 @@ export function TicketDetallePage() {
           {accionError && <p className="ticket-detalle-error">{accionError}</p>}
 
           {/* ---- Panel Usuario ---- */}
-          {esUsuario && ticket.estado === 'PENDIENTE_CORRECCION' && (
+          {tienePermiso('TICKET_REENVIAR') && ticket.estado === 'PENDIENTE_CORRECCION' && (
             <ReenviarPanel
               ticket={ticket}
               onReenviar={(titulo, descripcion) =>
@@ -176,7 +180,7 @@ export function TicketDetallePage() {
             />
           )}
 
-          {esUsuario && ticket.estado === 'CERRADO' && !ticket.validado && (
+          {tienePermiso('TICKET_VALIDAR_RESOLUCION') && ticket.estado === 'CERRADO' && !ticket.validado && (
             <div className="ticket-detalle-validacion">
               <p className="ticket-detalle-validacion-pregunta">¿La solución brindada resolvió su problema?</p>
               <div className="ticket-detalle-validacion-opciones">
@@ -189,25 +193,27 @@ export function TicketDetallePage() {
                   <span>Confirmar resolución</span>
                   <small>El problema fue resuelto</small>
                 </button>
-                <button
-                  type="button"
-                  className="ticket-detalle-validacion-rechazar"
-                  onClick={() => setModalReabrir(true)}
-                >
-                  <IconThumbDown size={22} />
-                  <span>Rechazar resolución</span>
-                  <small>El problema no fue resuelto</small>
-                </button>
+                {tienePermiso('TICKET_REABRIR_PROPIO') && (
+                  <button
+                    type="button"
+                    className="ticket-detalle-validacion-rechazar"
+                    onClick={() => setModalReabrir(true)}
+                  >
+                    <IconThumbDown size={22} />
+                    <span>Rechazar resolución</span>
+                    <small>El problema no fue resuelto</small>
+                  </button>
+                )}
               </div>
             </div>
           )}
 
-          {esUsuario && ticket.estado === 'CERRADO' && ticket.validado && (
+          {tienePermiso('TICKET_VALIDAR_RESOLUCION') && ticket.estado === 'CERRADO' && ticket.validado && (
             <p className="ticket-detalle-info">Ya confirmaste esta resolución. Gracias por tu respuesta.</p>
           )}
 
           {/* ---- Panel Operador / Administrador ---- */}
-          {esOperativo && (ticket.estado === 'NUEVO' || ticket.estado === 'PENDIENTE_CORRECCION') && (
+          {puedeClasificar && (ticket.estado === 'NUEVO' || ticket.estado === 'PENDIENTE_CORRECCION') && (
             <ClasificacionPanel
               ticket={ticket}
               categorias={categorias}
@@ -221,28 +227,32 @@ export function TicketDetallePage() {
             />
           )}
 
-          {esOperativo && ticket.estado === 'VALIDADO' && !ticket.operador && (
+          {puedeAsignar && ticket.estado === 'VALIDADO' && !ticket.operador && (
             <AsignacionPanel
               operadores={operadores}
               onAsignar={(idOperador) => ejecutar(() => asignarOperador(token!, ticketId, idOperador))}
             />
           )}
 
-          {esOperativo && (ticket.estado === 'EN_ANALISIS' || ticket.estado === 'REABIERTO') && ticket.operador && (
+          {(ticket.estado === 'EN_ANALISIS' || ticket.estado === 'REABIERTO') && ticket.operador && (
             <>
-              <ReasignacionPanel
-                operadores={operadores.filter((o) => o.id !== ticket.operador!.id)}
-                onReasignar={(idOperadorNuevo, motivo) =>
-                  ejecutar(() => reasignarOperador(token!, ticketId, idOperadorNuevo, motivo))
-                }
-              />
-              <div className="ticket-detalle-accion-simple">
-                <button onClick={() => ejecutar(() => marcarResuelto(token!, ticketId))}>Marcar como resuelto</button>
-              </div>
+              {puedeAsignar && (
+                <ReasignacionPanel
+                  operadores={operadores.filter((o) => o.id !== ticket.operador!.id)}
+                  onReasignar={(idOperadorNuevo, motivo) =>
+                    ejecutar(() => reasignarOperador(token!, ticketId, idOperadorNuevo, motivo))
+                  }
+                />
+              )}
+              {puedeResolver && (
+                <div className="ticket-detalle-accion-simple">
+                  <button onClick={() => ejecutar(() => marcarResuelto(token!, ticketId))}>Marcar como resuelto</button>
+                </div>
+              )}
             </>
           )}
 
-          {esOperativo && ticket.estado === 'RESUELTO' && (
+          {puedeResolver && ticket.estado === 'RESUELTO' && (
             <TicketAccionConTexto
               titulo="Cerrar ticket"
               placeholder="Describí la solución aplicada"
