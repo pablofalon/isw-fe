@@ -6,10 +6,15 @@ import { LoginPage } from './pages/LoginPage';
 import { HomePage } from './pages/HomePage';
 import { NuevoTicketPage } from './pages/NuevoTicketPage';
 import { TicketDetallePage } from './pages/TicketDetallePage';
+import { SeguridadPage } from './pages/SeguridadPage';
+import { UsuariosPage } from './pages/UsuariosPage';
+import { CambiarPasswordPage } from './pages/CambiarPasswordPage';
+import { RUTA_CAMBIAR_PASSWORD } from './auth/rutas';
+import type { Permiso } from './types/auth';
 
-function SoloUsuario({ children }: { children: React.ReactNode }) {
-  const { rol } = useAuth();
-  if (rol !== 'USUARIO') {
+function RequierePermiso({ permiso, children }: { permiso: Permiso; children: React.ReactNode }) {
+  const { tienePermiso } = useAuth();
+  if (!tienePermiso(permiso)) {
     return <Navigate to="/" replace />;
   }
   return <>{children}</>;
@@ -33,11 +38,28 @@ function App() {
             <Route
               path="tickets/nuevo"
               element={
-                <SoloUsuario>
+                <RequierePermiso permiso="TICKET_CREAR">
                   <NuevoTicketPage />
-                </SoloUsuario>
+                </RequierePermiso>
               }
             />
+            <Route
+              path="seguridad"
+              element={
+                <RequierePermiso permiso="SEGURIDAD_ADMINISTRAR">
+                  <SeguridadPage />
+                </RequierePermiso>
+              }
+            />
+            <Route
+              path="usuarios"
+              element={
+                <RequierePermiso permiso="USUARIOS_ADMINISTRAR">
+                  <UsuariosPage />
+                </RequierePermiso>
+              }
+            />
+            <Route path={RUTA_CAMBIAR_PASSWORD.slice(1)} element={<CambiarPasswordPage />} />
             <Route path="tickets/:id" element={<TicketDetallePage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

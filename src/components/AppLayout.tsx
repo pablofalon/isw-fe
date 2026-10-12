@@ -1,11 +1,13 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
-import { IconBell, IconHelp, IconHome, IconLogo, IconLogout, IconPlus, IconTicket, IconUser } from './icons';
+import { PERMISOS_BANDEJA } from '../types/auth';
+import { RUTA_CAMBIAR_PASSWORD } from '../auth/rutas';
+import { IconBell, IconHelp, IconHome, IconLogo, IconLogout, IconPlus, IconShield, IconTicket, IconUser, IconUsers } from './icons';
 import './AppLayout.css';
 
 export function AppLayout() {
-  const { nombreCompleto, rol, logout } = useAuth();
-  const esOperativo = rol === 'OPERADOR' || rol === 'ADMINISTRADOR';
+  const { nombreCompleto, rol, logout, tienePermiso } = useAuth();
+  const veBandeja = PERMISOS_BANDEJA.some(tienePermiso);
 
   return (
     <div className="app-layout">
@@ -21,32 +23,46 @@ export function AppLayout() {
             Inicio
           </button>
 
-          {esOperativo ? (
+          {veBandeja ? (
             <NavLink to="/" end className="app-sidebar-link">
               <IconTicket />
               Bandeja
             </NavLink>
           ) : (
-            <>
+            tienePermiso('TICKET_VER_PROPIOS') && (
               <NavLink to="/" end className="app-sidebar-link">
                 <IconTicket />
                 Mis Tickets
               </NavLink>
-              <NavLink to="/tickets/nuevo" className="app-sidebar-link">
-                <IconPlus />
-                Nuevo Ticket
-              </NavLink>
-            </>
+            )
+          )}
+          {tienePermiso('TICKET_CREAR') && (
+            <NavLink to="/tickets/nuevo" className="app-sidebar-link">
+              <IconPlus />
+              Nuevo Ticket
+            </NavLink>
+          )}
+          {tienePermiso('USUARIOS_ADMINISTRAR') && (
+            <NavLink to="/usuarios" className="app-sidebar-link">
+              <IconUsers />
+              Usuarios
+            </NavLink>
+          )}
+          {tienePermiso('SEGURIDAD_ADMINISTRAR') && (
+            <NavLink to="/seguridad" className="app-sidebar-link">
+              <IconShield />
+              Seguridad
+            </NavLink>
           )}
 
           <button type="button" className="app-sidebar-link" disabled title="Próximamente">
             <IconBell />
             Notificaciones
           </button>
-          <button type="button" className="app-sidebar-link" disabled title="Próximamente">
+          <NavLink to={RUTA_CAMBIAR_PASSWORD} className="app-sidebar-link">
             <IconUser />
-            Perfil
-          </button>
+            Cambiar contraseña
+          </NavLink>
           <button type="button" className="app-sidebar-link" disabled title="Próximamente">
             <IconHelp />
             Ayuda
