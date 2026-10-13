@@ -29,6 +29,15 @@ export interface Categoria {
   id: number;
   nombre: string;
   descripcion: string | null;
+  /** Área de operadores que atiende la categoría (CU13). */
+  area: string | null;
+}
+
+/** Límites configurables de CU02 (app.adjuntos.* en el backend). */
+export interface LimitesAdjuntos {
+  tamanioMaximoBytes: number;
+  maximoPorTicket: number;
+  extensionesPermitidas: string[];
 }
 
 export interface Prioridad {
@@ -45,15 +54,30 @@ export interface Adjunto {
   tamano: number;
   fechaCarga: string;
   descripcion: string | null;
+  /** Operador que lo subió como evidencia de una acción (CU08); null si lo subió el titular. */
+  operadorAutor: OperadorResumen | null;
 }
+
+/** CAMBIO_ESTADO: transición; ACTUALIZACION: cambio sin transición; ACCION: registrada con CU08. */
+export type TipoRegistroHistorial = 'CAMBIO_ESTADO' | 'ACTUALIZACION' | 'ACCION';
 
 export interface HistorialEstadoEntry {
   estado: string;
+  tipo: TipoRegistroHistorial;
   observacion: string | null;
   motivoCambio: string | null;
   fechaCambio: string;
   actorUsuario: UsuarioResumen | null;
   actorOperador: OperadorResumen | null;
+}
+
+/** CU15: autor = titular (usuarioAutor) u operador asignado (operadorAutor). */
+export interface Comentario {
+  id: number;
+  contenido: string;
+  fechaCreacion: string;
+  usuarioAutor: UsuarioResumen | null;
+  operadorAutor: OperadorResumen | null;
 }
 
 export interface HistorialAsignacionEntry {
@@ -81,15 +105,24 @@ export interface Ticket {
   fechaCierre: string | null;
   motivoCierre: string | null;
   motivoReapertura: string | null;
+  /** Descripción de la resolución (CU09). */
+  resolucion: string | null;
   validado: boolean;
   adjuntos: Adjunto[];
   historialEstados: HistorialEstadoEntry[];
   historialAsignaciones: HistorialAsignacionEntry[];
+  /** CU07: estados a los que quien consulta puede llevar el ticket. */
+  transicionesDisponibles: TicketEstadoCodigo[];
+  /** CU08: si quien consulta puede registrar acciones. */
+  puedeRegistrarAccion: boolean;
+  comentarios: Comentario[];
+  /** CU15: si quien consulta puede comentar. */
+  puedeComentar: boolean;
 }
 
 export interface CrearTicketInput {
   titulo: string;
   descripcion: string;
-  idCategoria?: number;
+  idCategoria: number;
   idPrioridadSugerida?: number;
 }

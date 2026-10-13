@@ -22,6 +22,9 @@ export function LoginPage() {
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         setError('Usuario o contraseña incorrectos.');
+      } else if (err instanceof ApiError && err.status === 403) {
+        // Cuenta inactiva o bloqueada temporalmente (CU23 FA2 / E1): el backend explica el motivo.
+        setError(err.message);
       } else {
         setError('No se pudo conectar con el servidor.');
       }

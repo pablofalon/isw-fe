@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
-import { adjuntarArchivo, registrarTicket } from '../api/tickets';
+import { adjuntarArchivo, limitesAdjuntos, registrarTicket } from '../api/tickets';
 import { listarCategorias, listarPrioridades } from '../api/catalogos';
 import { TicketForm } from '../components/TicketForm';
 import { IconCheck } from '../components/icons';
-import type { Categoria, Prioridad, Ticket } from '../types/ticket';
+import type { Categoria, LimitesAdjuntos, Prioridad, Ticket } from '../types/ticket';
 import './NuevoTicketPage.css';
 
 export function NuevoTicketPage() {
@@ -13,16 +13,19 @@ export function NuevoTicketPage() {
   const [creado, setCreado] = useState<Ticket | null>(null);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [prioridades, setPrioridades] = useState<Prioridad[]>([]);
+  const [limites, setLimites] = useState<LimitesAdjuntos | null>(null);
 
   useEffect(() => {
     listarCategorias(token!).then(setCategorias).catch(() => setCategorias([]));
     listarPrioridades(token!).then(setPrioridades).catch(() => setPrioridades([]));
+    // Sin límites el formulario valida solo el formato; el backend rechaza igual lo que se pase.
+    limitesAdjuntos(token!).then(setLimites).catch(() => setLimites(null));
   }, [token]);
 
   async function handleSubmit(input: {
     titulo: string;
     descripcion: string;
-    idCategoria?: number;
+    idCategoria: number;
     idPrioridadSugerida?: number;
     adjuntos: File[];
   }) {
@@ -82,7 +85,7 @@ export function NuevoTicketPage() {
     <div>
       <h2>Nuevo Ticket</h2>
       <p className="nuevo-ticket-subtitulo">Completá el formulario para registrar tu reclamo.</p>
-      <TicketForm categorias={categorias} prioridades={prioridades} onSubmit={handleSubmit} />
+      <TicketForm categorias={categorias} prioridades={prioridades} limites={limites} onSubmit={handleSubmit} />
     </div>
   );
 }

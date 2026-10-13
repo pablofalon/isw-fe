@@ -1,5 +1,5 @@
 import { ApiError, apiFetch } from './http';
-import type { Adjunto, CrearTicketInput, Ticket } from '../types/ticket';
+import type { Adjunto, CrearTicketInput, LimitesAdjuntos, Ticket, TicketEstadoCodigo } from '../types/ticket';
 
 export function registrarTicket(token: string, input: CrearTicketInput): Promise<Ticket> {
   return apiFetch<Ticket>('/api/tickets', {
@@ -91,8 +91,45 @@ export function reasignarOperador(
   });
 }
 
-export function marcarResuelto(token: string, ticketId: number): Promise<Ticket> {
-  return apiFetch<Ticket>(`/api/tickets/${ticketId}/resolver`, { method: 'POST', token });
+export function resolverTicket(token: string, ticketId: number, descripcion: string): Promise<Ticket> {
+  return apiFetch<Ticket>(`/api/tickets/${ticketId}/resolver`, { method: 'POST', token, body: { descripcion } });
+}
+
+// CU07 - Actualizar estado (resolver, cerrar o reabrir según el destino)
+export function actualizarEstado(
+  token: string,
+  ticketId: number,
+  estado: TicketEstadoCodigo,
+  observacion: string,
+): Promise<Ticket> {
+  return apiFetch<Ticket>(`/api/tickets/${ticketId}/estado`, { method: 'POST', token, body: { estado, observacion } });
+}
+
+// CU08 - Registrar acción, con evidencia opcional (FA2)
+export async function registrarAccion(
+  token: string,
+  ticketId: number,
+  descripcion: string,
+  archivo: File | null,
+): Promise<Ticket> {
+  const formData = new FormData();
+  formData.append('descripcion', descripcion);
+  if (archivo) {
+    formData.append('file', archivo);
+  }
+
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tickets/${ticketId}/acciones`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => null);
+    throw new ApiError(errorBody?.message ?? `Error ${response.status}`, response.status);
+  }
+
+  return response.json() as Promise<Ticket>;
 }
 
 // CU17 - Cerrar ticket
@@ -134,4 +171,18 @@ export async function adjuntarArchivo(token: string, ticketId: number, file: Fil
   }
 
   return response.json() as Promise<Adjunto>;
+}
+
+// CU02 FA3 - Eliminar adjunto
+export function eliminarAdjunto(token: string, ticketId: number, adjuntoId: number): Promise<Ticket> {
+  return apiFetch<Ticket>(`/api/tickets/${ticketId}/adjuntos/${adjuntoId}`, { method: 'DELETE', token });
+}
+
+export function limitesAdjuntos(token: string): Promise<LimitesAdjuntos> {
+  return apiFetch<LimitesAdjuntos>('/api/tickets/adjuntos/limites', { token });
+}
+
+// CU15 - Agregar comentario
+export function agregarComentario(token: string, ticketId: number, contenido: string): Promise<Ticket> {
+  return apiFetch<Ticket>(`/api/tickets/${ticketId}/comentarios`, { method: 'POST', token, body: { contenido } });
 }

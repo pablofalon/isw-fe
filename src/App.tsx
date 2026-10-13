@@ -9,6 +9,7 @@ import { TicketDetallePage } from './pages/TicketDetallePage';
 import { SeguridadPage } from './pages/SeguridadPage';
 import { UsuariosPage } from './pages/UsuariosPage';
 import { CambiarPasswordPage } from './pages/CambiarPasswordPage';
+import { NotificacionesPage } from './pages/NotificacionesPage';
 import { RUTA_CAMBIAR_PASSWORD } from './auth/rutas';
 import type { Permiso } from './types/auth';
 
@@ -61,6 +62,7 @@ function App() {
             />
             <Route path={RUTA_CAMBIAR_PASSWORD.slice(1)} element={<CambiarPasswordPage />} />
             <Route path="tickets/:id" element={<TicketDetallePage />} />
+            <Route path="notificaciones" element={<NotificacionesPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

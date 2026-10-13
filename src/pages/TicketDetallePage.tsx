@@ -2,28 +2,32 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import {
+  actualizarEstado,
+  agregarComentario,
   asignarOperador,
   asignarPrioridad,
-  cerrarTicket,
   clasificarTicket,
+  eliminarAdjunto,
   marcarIncompleto,
-  marcarResuelto,
   obtenerTicket,
   reabrirTicket,
   reasignarOperador,
   reenviarTicket,
+  registrarAccion,
   validarResolucion,
   validarTicket,
 } from '../api/tickets';
 import { listarCategorias, listarOperadores, listarPrioridades } from '../api/catalogos';
-import type { Categoria, OperadorResumen, Prioridad, Ticket } from '../types/ticket';
+import type { Categoria, Comentario, OperadorResumen, Prioridad, Ticket, TicketEstadoCodigo } from '../types/ticket';
 import { TicketEstadoBadge } from '../components/TicketEstadoBadge';
 import { HistorialTimeline } from '../components/HistorialTimeline';
-import { TicketAccionConTexto } from '../components/TicketAccionConTexto';
 import { ReabrirModal } from '../components/ReabrirModal';
-import { IconThumbDown, IconThumbUp } from '../components/icons';
+import { IconThumbDown, IconThumbUp, IconTrash } from '../components/icons';
 import { ApiError } from '../api/http';
 import './TicketDetallePage.css';
+
+/** Estados en los que el titular puede agregar o quitar adjuntos (CU02). */
+const ESTADOS_ADJUNTOS_EDITABLES: TicketEstadoCodigo[] = ['NUEVO', 'PENDIENTE_CORRECCION', 'EN_ANALISIS'];
 
 function numeroTicket(id: number): string {
   return `TK-${String(id).padStart(6, '0')}`;
@@ -44,7 +48,6 @@ export function TicketDetallePage() {
   const ticketId = Number(id);
   const puedeClasificar = tienePermiso('TICKET_CLASIFICAR');
   const puedeAsignar = tienePermiso('TICKET_ASIGNAR');
-  const puedeResolver = tienePermiso('TICKET_RESOLVER');
 
   function cargar() {
     obtenerTicket(token!, ticketId)
@@ -83,12 +86,16 @@ export function TicketDetallePage() {
     return <p>Cargando...</p>;
   }
 
-  async function ejecutar(accion: () => Promise<Ticket>) {
+  const puedeQuitarAdjuntos = tienePermiso('TICKET_CREAR') && ESTADOS_ADJUNTOS_EDITABLES.includes(ticket.estado);
+
+  async function ejecutar(accion: () => Promise<Ticket>): Promise<boolean> {
     setAccionError(null);
     try {
       setTicket(await accion());
+      return true;
     } catch (err) {
       setAccionError(err instanceof Error ? err.message : 'No se pudo completar la acción.');
+      return false;
     }
   }
 
@@ -108,11 +115,6 @@ export function TicketDetallePage() {
           <h2>Ticket #{numeroTicket(ticket.id)}</h2>
           <TicketEstadoBadge estado={ticket.estado} />
         </div>
-        {tienePermiso('TICKET_REABRIR_OPERATIVO') && ticket.operador && ticket.estado === 'CERRADO' && (
-          <button type="button" className="ticket-detalle-reabrir-btn" onClick={() => setModalReabrir(true)}>
-            Reabrir Ticket
-          </button>
-        )}
       </div>
 
       <div className="ticket-detalle-layout">
@@ -145,11 +147,41 @@ export function TicketDetallePage() {
                 <ul>
                   {ticket.adjuntos.map((adjunto) => (
                     <li key={adjunto.id}>
-                      {adjunto.nombreArchivo}
-                      <span className="ticket-detalle-adjunto-tamanio">{(adjunto.tamano / 1024).toFixed(0)} KB</span>
+                      <span>
+                        {adjunto.nombreArchivo}
+                        {adjunto.operadorAutor && (
+                          <span className="ticket-detalle-adjunto-evidencia">
+                            evidencia de {adjunto.operadorAutor.nombre} {adjunto.operadorAutor.apellido}
+                          </span>
+                        )}
+                      </span>
+                      <span className="ticket-detalle-adjunto-info">
+                        <span className="ticket-detalle-adjunto-tamanio">{(adjunto.tamano / 1024).toFixed(0)} KB</span>
+                        {puedeQuitarAdjuntos && !adjunto.operadorAutor && (
+                          <button
+                            type="button"
+                            className="ticket-detalle-adjunto-quitar"
+                            aria-label={`Eliminar ${adjunto.nombreArchivo}`}
+                            onClick={() => {
+                              if (window.confirm(`¿Eliminar el archivo ${adjunto.nombreArchivo}?`)) {
+                                ejecutar(() => eliminarAdjunto(token!, ticketId, adjunto.id));
+                              }
+                            }}
+                          >
+                            <IconTrash size={14} />
+                          </button>
+                        )}
+                      </span>
                     </li>
                   ))}
                 </ul>
+              </div>
+            )}
+
+            {ticket.resolucion && (
+              <div className="ticket-detalle-solucion">
+                <h4>Resolución del operador</h4>
+                <p>{ticket.resolucion}</p>
               </div>
             )}
 
@@ -230,6 +262,7 @@ export function TicketDetallePage() {
           {puedeAsignar && ticket.estado === 'VALIDADO' && !ticket.operador && (
             <AsignacionPanel
               operadores={operadores}
+              area={ticket.categoria?.area ?? null}
               onAsignar={(idOperador) => ejecutar(() => asignarOperador(token!, ticketId, idOperador))}
             />
           )}
@@ -244,22 +277,29 @@ export function TicketDetallePage() {
                   }
                 />
               )}
-              {puedeResolver && (
-                <div className="ticket-detalle-accion-simple">
-                  <button onClick={() => ejecutar(() => marcarResuelto(token!, ticketId))}>Marcar como resuelto</button>
-                </div>
-              )}
             </>
           )}
 
-          {puedeResolver && ticket.estado === 'RESUELTO' && (
-            <TicketAccionConTexto
-              titulo="Cerrar ticket"
-              placeholder="Describí la solución aplicada"
-              etiquetaBoton="Cerrar ticket"
-              onConfirmar={async (solucion) => setTicket(await cerrarTicket(token!, ticketId, solucion))}
+          {ticket.puedeRegistrarAccion && (
+            <RegistrarAccionPanel
+              onRegistrar={(descripcion, archivo) => ejecutar(() => registrarAccion(token!, ticketId, descripcion, archivo))}
             />
           )}
+
+          {ticket.transicionesDisponibles.length > 0 && (
+            <ActualizarEstadoPanel
+              key={ticket.estado}
+              ticket={ticket}
+              onConfirmar={(estado, observacion) => ejecutar(() => actualizarEstado(token!, ticketId, estado, observacion))}
+            />
+          )}
+
+          <ComentariosPanel
+            comentarios={ticket.comentarios}
+            puedeComentar={ticket.puedeComentar}
+            sinOperador={!ticket.operador && tienePermiso('TICKET_VER_PROPIOS')}
+            onComentar={async (texto) => setTicket(await agregarComentario(token!, ticketId, texto))}
+          />
         </div>
 
         <div className="ticket-detalle-aside">
@@ -365,22 +405,52 @@ function ClasificacionPanel({
   );
 }
 
+function mismaArea(a: string | null, b: string): boolean {
+  return a !== null && a.trim().toLowerCase() === b.trim().toLowerCase();
+}
+
 function AsignacionPanel({
   operadores,
+  area,
   onAsignar,
 }: {
   operadores: OperadorResumen[];
+  area: string | null;
   onAsignar: (idOperador: number) => void;
 }) {
   const [idOperador, setIdOperador] = useState('');
+  const [soloArea, setSoloArea] = useState(true);
+
+  // Paso 4: se sugieren los operadores del área de la categoría. FA1: si no hay, se listan todos.
+  const delArea = area ? operadores.filter((o) => mismaArea(o.area, area)) : [];
+  const filtrar = area !== null && delArea.length > 0 && soloArea;
+  const visibles = filtrar ? delArea : operadores;
 
   return (
     <div className="panel-operador">
       <h4>Asignar operador (CU13)</h4>
+      {area && delArea.length === 0 && (
+        <p className="panel-operador-hint">
+          No hay operadores activos del área <strong>{area}</strong>. Se muestran todos los operadores activos.
+        </p>
+      )}
+      {area && delArea.length > 0 && (
+        <label className="panel-operador-check">
+          <input
+            type="checkbox"
+            checked={soloArea}
+            onChange={(e) => {
+              setSoloArea(e.target.checked);
+              setIdOperador('');
+            }}
+          />
+          Solo operadores del área {area}
+        </label>
+      )}
       <div className="panel-operador-fila">
         <select value={idOperador} onChange={(e) => setIdOperador(e.target.value)}>
           <option value="">Seleccioná un operador</option>
-          {operadores.map((o) => (
+          {visibles.map((o) => (
             <option key={o.id} value={o.id}>
               {o.nombre} {o.apellido} {o.area ? `— ${o.area}` : ''}
             </option>
@@ -450,6 +520,252 @@ function ReenviarPanel({
       <button type="button" onClick={() => onReenviar(titulo, descripcion)}>
         Reenviar ticket
       </button>
+    </div>
+  );
+}
+
+/** Qué pide cada estado destino de CU07 y a qué caso de uso corresponde. */
+const DESTINOS_CU07: Partial<Record<TicketEstadoCodigo, { opcion: string; etiqueta: string; placeholder: string; boton: string }>> = {
+  RESUELTO: {
+    opcion: 'Resuelto (CU09)',
+    etiqueta: 'Descripción de la resolución *',
+    placeholder: 'Qué se hizo para resolver el reclamo',
+    boton: 'Marcar como resuelto',
+  },
+  CERRADO: {
+    opcion: 'Cerrado (CU17)',
+    etiqueta: 'Solución aplicada *',
+    placeholder: 'Solución definitiva que verá el usuario',
+    boton: 'Cerrar ticket',
+  },
+  REABIERTO: {
+    opcion: 'Reabierto (CU19)',
+    etiqueta: 'Motivo de la reapertura *',
+    placeholder: 'Por qué el problema persiste',
+    boton: 'Reabrir ticket',
+  },
+};
+
+function ActualizarEstadoPanel({
+  ticket,
+  onConfirmar,
+}: {
+  ticket: Ticket;
+  onConfirmar: (estado: TicketEstadoCodigo, observacion: string) => Promise<boolean>;
+}) {
+  const unico = ticket.transicionesDisponibles.length === 1 ? ticket.transicionesDisponibles[0] : null;
+  const [destino, setDestino] = useState<TicketEstadoCodigo | ''>(unico ?? '');
+  // Al cerrar se propone la resolución de CU09 como punto de partida de la solución.
+  const [texto, setTexto] = useState(unico === 'CERRADO' ? (ticket.resolucion ?? '') : '');
+  const [error, setError] = useState<string | null>(null);
+
+  const config = destino ? DESTINOS_CU07[destino] : undefined;
+  // CU09 FA2: se advierte si no hay acciones registradas (CU08), sin bloquear.
+  const sinAcciones = !ticket.historialEstados.some((h) => h.tipo === 'ACCION');
+
+  function elegir(nuevo: TicketEstadoCodigo | '') {
+    setDestino(nuevo);
+    setError(null);
+    setTexto(nuevo === 'CERRADO' ? (ticket.resolucion ?? '') : '');
+  }
+
+  async function confirmar() {
+    if (!destino) return;
+    if (!texto.trim()) {
+      setError('Completá el campo antes de confirmar.');
+      return;
+    }
+    if (destino === 'RESUELTO' && sinAcciones && !window.confirm('No hay acciones registradas sobre el ticket. ¿Resolverlo igual?')) {
+      return;
+    }
+    setError(null);
+    await onConfirmar(destino, texto.trim());
+  }
+
+  return (
+    <div className="panel-operador">
+      <h4>Actualizar estado (CU07)</h4>
+      <p className="panel-operador-hint">
+        Estado actual: <strong>{ticket.estadoNombre}</strong>
+      </p>
+      <label htmlFor="cu07-destino">Nuevo estado</label>
+      <select id="cu07-destino" value={destino} onChange={(e) => elegir(e.target.value as TicketEstadoCodigo | '')}>
+        {!unico && <option value="">Seleccioná el nuevo estado</option>}
+        {ticket.transicionesDisponibles.map((estado) => (
+          <option key={estado} value={estado}>
+            {DESTINOS_CU07[estado]?.opcion ?? estado}
+          </option>
+        ))}
+      </select>
+      {config && (
+        <>
+          <label htmlFor="cu07-texto">{config.etiqueta}</label>
+          <textarea
+            id="cu07-texto"
+            rows={3}
+            value={texto}
+            placeholder={config.placeholder}
+            onChange={(e) => setTexto(e.target.value)}
+          />
+          {destino === 'RESUELTO' && sinAcciones && (
+            <p className="panel-operador-aviso">Todavía no hay acciones registradas sobre este ticket (CU08).</p>
+          )}
+          {error && <p className="panel-operador-error">{error}</p>}
+          <div className="panel-operador-fila">
+            <button type="button" onClick={confirmar}>
+              {config.boton}
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function RegistrarAccionPanel({
+  onRegistrar,
+}: {
+  onRegistrar: (descripcion: string, archivo: File | null) => Promise<boolean>;
+}) {
+  const [descripcion, setDescripcion] = useState('');
+  const [archivo, setArchivo] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [enviando, setEnviando] = useState(false);
+  const [inputKey, setInputKey] = useState(0);
+
+  async function registrar() {
+    if (!descripcion.trim()) {
+      setError('Describí la acción realizada.');
+      return;
+    }
+    setError(null);
+    setEnviando(true);
+    const ok = await onRegistrar(descripcion.trim(), archivo);
+    setEnviando(false);
+    if (ok) {
+      setDescripcion('');
+      setArchivo(null);
+      setInputKey((k) => k + 1);
+    }
+  }
+
+  return (
+    <div className="panel-operador">
+      <h4>Registrar acción (CU08)</h4>
+      <label htmlFor="cu08-descripcion">Acción realizada *</label>
+      <textarea
+        id="cu08-descripcion"
+        rows={3}
+        value={descripcion}
+        placeholder="Intervención, tarea u observación sobre el ticket"
+        onChange={(e) => setDescripcion(e.target.value)}
+      />
+      <label htmlFor="cu08-archivo">Evidencia (opcional)</label>
+      <input
+        key={inputKey}
+        id="cu08-archivo"
+        type="file"
+        accept=".jpg,.jpeg,.png,.pdf,.docx,.xlsx"
+        onChange={(e) => setArchivo(e.target.files?.[0] ?? null)}
+      />
+      {error && <p className="panel-operador-error">{error}</p>}
+      <div className="panel-operador-fila">
+        <button type="button" onClick={registrar} disabled={enviando}>
+          {enviando ? 'Registrando...' : 'Registrar acción'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+const LARGO_MAXIMO_COMENTARIO = 2000;
+
+function autorComentario(comentario: Comentario): string {
+  if (comentario.operadorAutor) {
+    return `${comentario.operadorAutor.nombre} ${comentario.operadorAutor.apellido} (operador)`;
+  }
+  return comentario.usuarioAutor ? `${comentario.usuarioAutor.nombre} ${comentario.usuarioAutor.apellido}` : 'Sistema';
+}
+
+function ComentariosPanel({
+  comentarios,
+  puedeComentar,
+  sinOperador,
+  onComentar,
+}: {
+  comentarios: Comentario[];
+  puedeComentar: boolean;
+  sinOperador: boolean;
+  onComentar: (texto: string) => Promise<void>;
+}) {
+  const [texto, setTexto] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [enviando, setEnviando] = useState(false);
+
+  async function enviar() {
+    // FA1: vacío o más largo que el máximo.
+    if (!texto.trim()) {
+      setError('Escribí el comentario antes de enviarlo.');
+      return;
+    }
+    if (texto.length > LARGO_MAXIMO_COMENTARIO) {
+      setError(`El comentario no puede superar los ${LARGO_MAXIMO_COMENTARIO} caracteres.`);
+      return;
+    }
+    setError(null);
+    setEnviando(true);
+    try {
+      await onComentar(texto.trim());
+      setTexto('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo registrar el comentario.');
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  return (
+    <div className="ticket-detalle-card ticket-detalle-comentarios">
+      <h4>Comentarios ({comentarios.length})</h4>
+      {comentarios.length === 0 ? (
+        <p className="ticket-detalle-comentarios-vacio">Todavía no hay comentarios.</p>
+      ) : (
+        <ul>
+          {comentarios.map((c) => (
+            <li key={c.id} className={c.operadorAutor ? 'comentario-operador' : 'comentario-usuario'}>
+              <div className="comentario-header">
+                <strong>{autorComentario(c)}</strong>
+                <span>{new Date(c.fechaCreacion).toLocaleString()}</span>
+              </div>
+              <p>{c.contenido}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+      {puedeComentar && (
+        <div className="ticket-detalle-comentar">
+          <textarea
+            rows={3}
+            value={texto}
+            placeholder="Escribí una consulta, aclaración o novedad"
+            onChange={(e) => setTexto(e.target.value)}
+          />
+          <div className="ticket-detalle-comentar-pie">
+            <span className={texto.length > LARGO_MAXIMO_COMENTARIO ? 'comentario-largo-excedido' : ''}>
+              {texto.length}/{LARGO_MAXIMO_COMENTARIO}
+            </span>
+            <button type="button" onClick={enviar} disabled={enviando}>
+              {enviando ? 'Enviando...' : 'Agregar comentario'}
+            </button>
+          </div>
+          {sinOperador && (
+            <p className="ticket-detalle-comentarios-vacio">
+              Todavía no hay un operador asignado: el comentario queda registrado y lo va a ver quien tome el caso.
+            </p>
+          )}
+          {error && <p className="ticket-detalle-error">{error}</p>}
+        </div>
+      )}
     </div>
   );
 }

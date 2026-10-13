@@ -1,7 +1,7 @@
 import { useRef, useState, type DragEvent, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconFile, IconTrash, IconUpload } from './icons';
-import type { Categoria, Prioridad } from '../types/ticket';
+import type { Categoria, LimitesAdjuntos, Prioridad } from '../types/ticket';
 import './TicketForm.css';
 
 const EXTENSIONES_PERMITIDAS = ['jpg', 'jpeg', 'png', 'pdf', 'docx', 'xlsx'];
@@ -9,10 +9,11 @@ const EXTENSIONES_PERMITIDAS = ['jpg', 'jpeg', 'png', 'pdf', 'docx', 'xlsx'];
 interface TicketFormProps {
   categorias: Categoria[];
   prioridades: Prioridad[];
+  limites: LimitesAdjuntos | null;
   onSubmit: (input: {
     titulo: string;
     descripcion: string;
-    idCategoria?: number;
+    idCategoria: number;
     idPrioridadSugerida?: number;
     adjuntos: File[];
   }) => Promise<void>;
@@ -27,7 +28,7 @@ function formatoTamanio(bytes: number): string {
   return `${(bytes / 1024).toFixed(0)} KB`;
 }
 
-export function TicketForm({ categorias, prioridades, onSubmit }: TicketFormProps) {
+export function TicketForm({ categorias, prioridades, limites, onSubmit }: TicketFormProps) {
   const navigate = useNavigate();
   const [titulo, setTitulo] = useState('');
   const [descripcion, setDescripcion] = useState('');
@@ -42,10 +43,22 @@ export function TicketForm({ categorias, prioridades, onSubmit }: TicketFormProp
   function handleFilesSelected(files: FileList | null) {
     if (!files) return;
     const nuevos = Array.from(files);
-    const invalido = nuevos.find((f) => !EXTENSIONES_PERMITIDAS.includes(extension(f.name)));
+    const extensiones = limites?.extensionesPermitidas ?? EXTENSIONES_PERMITIDAS;
+    const invalido = nuevos.find((f) => !extensiones.includes(extension(f.name)));
     if (invalido) {
       setError(`Formato no permitido: ${invalido.name}. Formatos válidos: JPG, PNG, PDF, DOCX, XLSX`);
       return;
+    }
+    if (limites) {
+      const grande = nuevos.find((f) => f.size > limites.tamanioMaximoBytes);
+      if (grande) {
+        setError(`${grande.name} supera el tamaño máximo de ${formatoTamanio(limites.tamanioMaximoBytes)}.`);
+        return;
+      }
+      if (adjuntos.length + nuevos.length > limites.maximoPorTicket) {
+        setError(`Se pueden adjuntar hasta ${limites.maximoPorTicket} archivos por ticket.`);
+        return;
+      }
     }
     setError(null);
     setAdjuntos((prev) => [...prev, ...nuevos]);
@@ -69,7 +82,7 @@ export function TicketForm({ categorias, prioridades, onSubmit }: TicketFormProp
       await onSubmit({
         titulo,
         descripcion,
-        idCategoria: idCategoria ? Number(idCategoria) : undefined,
+        idCategoria: Number(idCategoria),
         idPrioridadSugerida: idPrioridad ? Number(idPrioridad) : undefined,
         adjuntos,
       });
@@ -91,9 +104,9 @@ export function TicketForm({ categorias, prioridades, onSubmit }: TicketFormProp
         required
       />
 
-      <label htmlFor="categoria">Categoría</label>
-      <select id="categoria" value={idCategoria} onChange={(e) => setIdCategoria(e.target.value)}>
-        <option value="">Sin especificar</option>
+      <label htmlFor="categoria">Categoría *</label>
+      <select id="categoria" value={idCategoria} onChange={(e) => setIdCategoria(e.target.value)} required>
+        <option value="">Seleccioná una categoría</option>
         {categorias.map((categoria) => (
           <option key={categoria.id} value={categoria.id}>
             {categoria.nombre}
@@ -149,7 +162,11 @@ export function TicketForm({ categorias, prioridades, onSubmit }: TicketFormProp
             e.target.value = '';
           }}
         />
-        <small>Formatos permitidos: JPG, PNG, PDF, DOCX, XLSX</small>
+        <small>
+          Formatos permitidos: JPG, PNG, PDF, DOCX, XLSX
+          {limites &&
+            ` · Hasta ${limites.maximoPorTicket} archivos de ${formatoTamanio(limites.tamanioMaximoBytes)} como máximo`}
+        </small>
       </div>
 
       {adjuntos.length > 0 && (

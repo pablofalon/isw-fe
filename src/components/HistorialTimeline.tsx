@@ -1,6 +1,12 @@
 import type { HistorialEstadoEntry } from '../types/ticket';
 import './HistorialTimeline.css';
 
+function encabezado(entry: HistorialEstadoEntry): string {
+  if (entry.tipo === 'ACCION') return 'Acción registrada';
+  if (entry.tipo === 'ACTUALIZACION') return 'Actualización';
+  return entry.estado;
+}
+
 function actorLabel(entry: HistorialEstadoEntry): string {
   if (entry.actorUsuario) {
     return `${entry.actorUsuario.nombre} ${entry.actorUsuario.apellido}`;
@@ -21,9 +27,9 @@ export function HistorialTimeline({ historial }: { historial: HistorialEstadoEnt
       <h3>Historial</h3>
       <ul>
         {historial.map((entry, index) => (
-          <li key={index}>
+          <li key={index} className={`historial-item-${entry.tipo.toLowerCase()}`}>
             <div className="historial-item-header">
-              <strong>{entry.estado}</strong>
+              <strong>{encabezado(entry)}</strong>
               <span>{new Date(entry.fechaCambio).toLocaleString()}</span>
             </div>
             <div className="historial-item-actor">{actorLabel(entry)}</div>
