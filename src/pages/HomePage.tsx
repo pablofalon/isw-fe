@@ -16,6 +16,10 @@ export function HomePage() {
     return <MisTicketsPage />;
   }
 
+  if (tienePermiso('REPORTES_CONSULTAR')) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   if (tienePermiso('USUARIOS_ADMINISTRAR')) {
     return <Navigate to="/usuarios" replace />;
   }

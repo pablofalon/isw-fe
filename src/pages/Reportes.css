@@ -1,0 +1,241 @@
+/* Estilos compartidos por las pantallas de reportes (CU20, CU21, CU22). */
+.reportes-header {
+  margin-bottom: 16px;
+}
+
+.reportes-header h2 {
+  margin: 0;
+}
+
+.reportes-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.reportes-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.reportes-form select,
+.reportes-form input {
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--color-card);
+}
+
+.reportes-boton {
+  padding: 9px 16px;
+  border: 1px solid var(--color-primary);
+  border-radius: 6px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.reportes-boton:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.reportes-boton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.reportes-boton-secundario {
+  border-color: var(--color-border);
+  background: var(--color-card);
+  color: var(--color-text);
+}
+
+.reportes-boton-secundario:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background: var(--color-card);
+  color: var(--color-primary);
+}
+
+.reportes-error {
+  color: var(--color-danger-text);
+}
+
+.reportes-aviso {
+  padding: 24px 0;
+  color: var(--color-text-muted);
+}
+
+.reportes-resultado-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.reportes-resultado-header h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.reportes-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-card);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.reportes-table th,
+.reportes-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 13px;
+}
+
+.reportes-table th {
+  background: #f8fafc;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.reportes-table .reportes-numero {
+  text-align: right;
+}
+
+.reportes-table tfoot td {
+  font-weight: 700;
+  background: #f8fafc;
+  border-bottom: none;
+}
+
+.reportes-modal-fondo {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 26, 52, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.reportes-modal {
+  background: var(--color-card);
+  border-radius: 10px;
+  padding: 24px;
+  width: min(420px, 92vw);
+  box-shadow: var(--shadow-card);
+}
+
+.reportes-modal h3 {
+  margin: 0 0 4px 0;
+}
+
+.reportes-modal p {
+  margin: 0 0 16px 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.reportes-modal fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reportes-modal-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.dashboard-resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.dashboard-tarjeta {
+  background: var(--color-card);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  padding: 14px 16px;
+}
+
+.dashboard-tarjeta span {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.dashboard-tarjeta strong {
+  font-size: 26px;
+}
+
+.dashboard-paneles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.dashboard-panel {
+  background: var(--color-card);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  padding: 16px 20px;
+}
+
+.dashboard-panel h3 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+}
+
+.dashboard-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dashboard-fila {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.dashboard-barra {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-primary-bg);
+}
+
+.dashboard-barra div {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--color-primary);
+}
