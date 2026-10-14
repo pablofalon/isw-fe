@@ -27,20 +27,7 @@
   font-size: 20px;
 }
 
-.ticket-detalle-reabrir-btn {
-  padding: 9px 18px;
-  border: none;
-  border-radius: 6px;
-  background: var(--color-danger);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
 
-.ticket-detalle-reabrir-btn:hover {
-  background: var(--color-danger-hover);
-}
 
 .ticket-detalle-layout {
   display: grid;
@@ -116,6 +103,25 @@
   color: var(--color-text-muted);
 }
 
+.ticket-detalle-adjunto-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ticket-detalle-adjunto-quitar {
+  display: inline-flex;
+  padding: 2px;
+  border: none;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.ticket-detalle-adjunto-quitar:hover {
+  color: var(--color-danger-text);
+}
+
 .ticket-detalle-solucion p {
   margin: 0;
   color: var(--color-text);
@@ -126,20 +132,7 @@
   color: var(--color-danger-text);
 }
 
-.ticket-detalle-accion-simple button {
-  padding: 10px 18px;
-  border: none;
-  border-radius: 6px;
-  background: var(--color-primary);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
 
-.ticket-detalle-accion-simple button:hover {
-  background: var(--color-primary-hover);
-}
 
 .ticket-detalle-validacion {
   background: var(--color-card);
@@ -273,6 +266,18 @@
   width: 100%;
 }
 
+.panel-operador .panel-operador-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 400;
+  margin-top: 0;
+}
+
+.panel-operador .panel-operador-check input {
+  width: auto;
+}
+
 .panel-operador-fila {
   display: flex;
   gap: 8px;
@@ -314,4 +319,109 @@
 
 .panel-operador-incompleto {
   background: var(--color-danger) !important;
+}
+
+.ticket-detalle-adjunto-evidencia {
+  margin-left: 8px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.panel-operador .panel-operador-aviso {
+  color: var(--color-warning-text);
+}
+
+.panel-operador .panel-operador-error {
+  color: var(--color-danger-text);
+}
+
+.ticket-detalle-comentarios h4 {
+  margin: 0 0 12px 0;
+}
+
+.ticket-detalle-comentarios ul {
+  list-style: none;
+  margin: 0 0 12px 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ticket-detalle-comentarios li {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border-left: 3px solid var(--color-border);
+}
+
+.ticket-detalle-comentarios li.comentario-operador {
+  background: var(--color-primary-bg);
+  border-left-color: var(--color-primary);
+}
+
+.comentario-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.comentario-header strong {
+  color: var(--color-text);
+}
+
+.ticket-detalle-comentarios li p {
+  margin: 6px 0 0 0;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+.ticket-detalle-comentarios-vacio {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.ticket-detalle-comentar textarea {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.ticket-detalle-comentar-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 8px 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.ticket-detalle-comentar-pie button {
+  padding: 9px 16px;
+  border: none;
+  border-radius: 6px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ticket-detalle-comentar-pie button:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.comentario-largo-excedido {
+  color: var(--color-danger-text);
+  font-weight: 600;
 }

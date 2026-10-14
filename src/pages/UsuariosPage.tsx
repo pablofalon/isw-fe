@@ -158,6 +158,11 @@ export function UsuariosPage() {
                     <button type="button" onClick={() => setEditor({ modo: 'blanqueo', usuario: u })}>
                       Blanquear contraseña
                     </button>
+                    {u.bloqueadaPorIntentos && (
+                      <button type="button" onClick={() => ejecutar(() => activarUsuario(token!, u.id), `${u.usuarioLogin} quedó desbloqueado.`)}>
+                        Desbloquear
+                      </button>
+                    )}
                     {u.activa ? (
                       <button
                         type="button"
@@ -172,7 +177,7 @@ export function UsuariosPage() {
                       </button>
                     ) : (
                       <button type="button" onClick={() => ejecutar(() => activarUsuario(token!, u.id), `${u.usuarioLogin} quedó activo.`)}>
-                        {u.bloqueadaPorIntentos ? 'Desbloquear' : 'Reactivar'}
+                        Reactivar
                       </button>
                     )}
                   </td>
