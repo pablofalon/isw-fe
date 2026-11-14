@@ -304,6 +304,11 @@ export function TicketDetallePage() {
 
         <div className="ticket-detalle-aside">
           <HistorialTimeline historial={ticket.historialEstados} />
+          {tienePermiso('TICKET_VER_TODOS') && (
+            <Link to={`/tickets/${ticket.id}/historial`} className="historial-ticket-link">
+              Ver historial completo
+            </Link>
+          )}
         </div>
       </div>
 

@@ -4,7 +4,22 @@ import { useAuth } from '../auth/AuthContext';
 import { PERMISOS_BANDEJA } from '../types/auth';
 import { RUTA_CAMBIAR_PASSWORD } from '../auth/rutas';
 import { cantidadNoLeidas, EVENTO_NOTIFICACIONES } from '../api/notificaciones';
-import { IconBell, IconHelp, IconHome, IconLogo, IconLogout, IconPlus, IconShield, IconTicket, IconUser, IconUsers } from './icons';
+import {
+  IconBell,
+  IconChart,
+  IconClock,
+  IconFile,
+  IconHelp,
+  IconHome,
+  IconList,
+  IconLogo,
+  IconLogout,
+  IconPlus,
+  IconShield,
+  IconTicket,
+  IconUser,
+  IconUsers,
+} from './icons';
 import './AppLayout.css';
 
 export function AppLayout() {
@@ -62,6 +77,30 @@ export function AppLayout() {
               <IconPlus />
               Nuevo Ticket
             </NavLink>
+          )}
+          {tienePermiso('TICKET_VER_TODOS') && (
+            <>
+              <NavLink to="/tickets/operativos" className="app-sidebar-link">
+                <IconList />
+                Tickets operativos
+              </NavLink>
+              <NavLink to="/tiempos-respuesta" className="app-sidebar-link">
+                <IconClock />
+                Tiempos de respuesta
+              </NavLink>
+            </>
+          )}
+          {tienePermiso('REPORTES_CONSULTAR') && (
+            <>
+              <NavLink to="/dashboard" className="app-sidebar-link">
+                <IconChart />
+                Dashboard
+              </NavLink>
+              <NavLink to="/reportes" className="app-sidebar-link">
+                <IconFile />
+                Reportes
+              </NavLink>
+            </>
           )}
           {tienePermiso('USUARIOS_ADMINISTRAR') && (
             <NavLink to="/usuarios" className="app-sidebar-link">

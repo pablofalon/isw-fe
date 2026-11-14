@@ -126,3 +126,55 @@ export interface CrearTicketInput {
   idCategoria: number;
   idPrioridadSugerida?: number;
 }
+
+/** CU10 / CU11: tickets asignados al operador o todos los del sistema. */
+export type VistaTickets = 'MIS_TICKETS' | 'TODOS';
+
+export interface FiltrosOperativos {
+  /** Un estado final incorpora esos tickets al listado (CU10 FA2); vacío = solo los operativos. */
+  estado: TicketEstadoCodigo | '';
+  idPrioridad: string;
+  idCategoria: string;
+  idOperador: string;
+  desde: string;
+  hasta: string;
+  /** Número de ticket (TK-000034 o solo los dígitos). */
+  numero: string;
+}
+
+export type CumplimientoTiempo = 'VENCIDO' | 'PROXIMO_A_VENCER' | 'EN_PLAZO' | 'SIN_PRIORIDAD';
+
+export interface FiltrosTiempos {
+  idPrioridad: string;
+  idCategoria: string;
+  cumplimiento: CumplimientoTiempo | '';
+  desde: string;
+  hasta: string;
+}
+
+/** Los tiempos están en horas; horasObjetivo y porcentajeConsumido son null en los tickets sin prioridad. */
+export interface TiempoRespuesta {
+  ticket: Ticket;
+  cumplimiento: CumplimientoTiempo;
+  horasTranscurridas: number;
+  horasObjetivo: number | null;
+  porcentajeConsumido: number | null;
+  atendido: boolean;
+}
+
+export interface MonitoreoTiempos {
+  resumen: {
+    enPlazo: number;
+    proximosAVencer: number;
+    vencidos: number;
+    sinPrioridad: number;
+    promedioHoras: number;
+  };
+  tickets: TiempoRespuesta[];
+}
+
+export interface FiltrosHistorial {
+  estado: TicketEstadoCodigo | '';
+  desde: string;
+  hasta: string;
+}

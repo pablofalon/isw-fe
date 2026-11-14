@@ -1,5 +1,17 @@
-import { ApiError, apiFetch } from './http';
-import type { Adjunto, CrearTicketInput, LimitesAdjuntos, Ticket, TicketEstadoCodigo } from '../types/ticket';
+import { ApiError, apiFetch, queryString } from './http';
+import type {
+  Adjunto,
+  CrearTicketInput,
+  FiltrosHistorial,
+  FiltrosOperativos,
+  FiltrosTiempos,
+  HistorialEstadoEntry,
+  LimitesAdjuntos,
+  MonitoreoTiempos,
+  Ticket,
+  TicketEstadoCodigo,
+  VistaTickets,
+} from '../types/ticket';
 
 export function registrarTicket(token: string, input: CrearTicketInput): Promise<Ticket> {
   return apiFetch<Ticket>('/api/tickets', {
@@ -185,4 +197,27 @@ export function limitesAdjuntos(token: string): Promise<LimitesAdjuntos> {
 // CU15 - Agregar comentario
 export function agregarComentario(token: string, ticketId: number, contenido: string): Promise<Ticket> {
   return apiFetch<Ticket>(`/api/tickets/${ticketId}/comentarios`, { method: 'POST', token, body: { contenido } });
+}
+
+// CU10 - Consultar tickets operativos
+export function listarOperativos(token: string, vista: VistaTickets, filtros: FiltrosOperativos): Promise<Ticket[]> {
+  return apiFetch<Ticket[]>(`/api/tickets/operativos${queryString({ vista, ...filtros })}`, { token });
+}
+
+// CU11 - Monitorear tiempos de respuesta
+export function monitorearTiempos(
+  token: string,
+  alcance: VistaTickets,
+  filtros: FiltrosTiempos,
+): Promise<MonitoreoTiempos> {
+  return apiFetch<MonitoreoTiempos>(`/api/tickets/tiempos-respuesta${queryString({ alcance, ...filtros })}`, { token });
+}
+
+// CU12 - Consultar historial del ticket (más reciente primero)
+export function historialTicket(
+  token: string,
+  ticketId: number,
+  filtros: FiltrosHistorial,
+): Promise<HistorialEstadoEntry[]> {
+  return apiFetch<HistorialEstadoEntry[]>(`/api/tickets/${ticketId}/historial${queryString({ ...filtros })}`, { token });
 }

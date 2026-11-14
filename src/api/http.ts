@@ -38,3 +38,15 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
 
   return response.json() as Promise<T>;
 }
+
+/** Arma el query string con los parámetros informados (los vacíos se omiten). */
+export function queryString(params: Record<string, string | number | boolean | undefined | null>): string {
+  const search = new URLSearchParams();
+  for (const [clave, valor] of Object.entries(params)) {
+    if (valor !== undefined && valor !== null && valor !== '') {
+      search.set(clave, String(valor));
+    }
+  }
+  const texto = search.toString();
+  return texto ? `?${texto}` : '';
+}

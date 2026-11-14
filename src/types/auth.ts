@@ -14,7 +14,8 @@ export type Permiso =
   | 'TICKET_REABRIR_OPERATIVO'
   | 'TICKET_GESTIONAR_TODOS'
   | 'SEGURIDAD_ADMINISTRAR'
-  | 'USUARIOS_ADMINISTRAR';
+  | 'USUARIOS_ADMINISTRAR'
+  | 'REPORTES_CONSULTAR';
 
 /** Permisos que habilitan la bandeja operativa (alcanza con cualquiera de ellas). */
 export const PERMISOS_BANDEJA: Permiso[] = ['TICKET_CLASIFICAR', 'TICKET_ASIGNAR', 'TICKET_RESOLVER'];

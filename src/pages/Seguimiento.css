@@ -1,0 +1,195 @@
+/* Estilos compartidos por las pantallas de seguimiento (CU10, CU11, CU12). */
+.seguimiento-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.seguimiento-header h2 {
+  margin: 0;
+}
+
+.seguimiento-vistas {
+  display: inline-flex;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.seguimiento-vista {
+  padding: 8px 14px;
+  border: none;
+  background: var(--color-card);
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.seguimiento-vista-activa {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.seguimiento-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.seguimiento-filtros label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.seguimiento-filtros select,
+.seguimiento-filtros input {
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--color-card);
+}
+
+.seguimiento-boton {
+  padding: 8px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-card);
+  color: var(--color-text);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.seguimiento-boton:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.seguimiento-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-card);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.seguimiento-table th,
+.seguimiento-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 13px;
+}
+
+.seguimiento-table tr:last-child td {
+  border-bottom: none;
+}
+
+.seguimiento-table th {
+  background: #f8fafc;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.seguimiento-table a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.seguimiento-vacio {
+  text-align: center;
+  padding: 48px 0;
+  color: var(--color-text-muted);
+}
+
+.seguimiento-error {
+  color: var(--color-danger-text);
+}
+
+.seguimiento-resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.seguimiento-tarjeta {
+  background: var(--color-card);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  padding: 14px 16px;
+}
+
+.seguimiento-tarjeta span {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.seguimiento-tarjeta strong {
+  font-size: 24px;
+}
+
+.cumplimiento-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cumplimiento-en_plazo {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.cumplimiento-proximo_a_vencer {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.cumplimiento-vencido {
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.cumplimiento-sin_prioridad {
+  background: #f3f4f6;
+  color: var(--color-text-muted);
+}
+
+.historial-ticket-volver {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.historial-ticket-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
