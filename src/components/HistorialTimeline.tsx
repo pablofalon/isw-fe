@@ -1,6 +1,7 @@
 import type { HistorialEstadoEntry } from '../types/ticket';
 import './HistorialTimeline.css';
 
+import { formatearFechaHora } from '../utils/fechas';
 function encabezado(entry: HistorialEstadoEntry): string {
   if (entry.tipo === 'ACCION') return 'Acción registrada';
   if (entry.tipo === 'ACTUALIZACION') return 'Actualización';
@@ -30,7 +31,7 @@ export function HistorialTimeline({ historial }: { historial: HistorialEstadoEnt
           <li key={index} className={`historial-item-${entry.tipo.toLowerCase()}`}>
             <div className="historial-item-header">
               <strong>{encabezado(entry)}</strong>
-              <span>{new Date(entry.fechaCambio).toLocaleString()}</span>
+              <span>{formatearFechaHora(entry.fechaCambio)}</span>
             </div>
             <div className="historial-item-actor">{actorLabel(entry)}</div>
             {entry.observacion && <div className="historial-item-detalle">{entry.observacion}</div>}

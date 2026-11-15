@@ -13,6 +13,8 @@ import type {
 } from '../types/ticket';
 import './Seguimiento.css';
 
+import { CampoFecha } from '../components/CampoFecha';
+import { formatearDuracion } from '../utils/fechas';
 const CUMPLIMIENTOS: { codigo: CumplimientoTiempo; nombre: string }[] = [
   { codigo: 'VENCIDO', nombre: 'Vencido' },
   { codigo: 'PROXIMO_A_VENCER', nombre: 'Próximo a vencer' },
@@ -27,14 +29,15 @@ const NOMBRE_CUMPLIMIENTO = Object.fromEntries(CUMPLIMIENTOS.map((c) => [c.codig
 
 const SIN_FILTROS: FiltrosTiempos = { idPrioridad: '', idCategoria: '', cumplimiento: '', desde: '', hasta: '' };
 
-function formatearHoras(horas: number): string {
-  return horas.toLocaleString('es-AR', { maximumFractionDigits: 2 });
+function formatearPorcentaje(valor: number): string {
+  return valor.toLocaleString('es-AR', { maximumFractionDigits: 2 });
 }
 
 /** CU11 - Monitorear tiempos de respuesta frente al objetivo de cada prioridad. */
 export function TiemposRespuestaPage() {
-  const { token } = useAuth();
-  const [alcance, setAlcance] = useState<VistaTickets>('MIS_TICKETS');
+  const { token, tienePermiso } = useAuth();
+  // Quien gestiona todos los tickets suele no tener asignados: arranca viendo todos.
+  const [alcance, setAlcance] = useState<VistaTickets>(tienePermiso('TICKET_GESTIONAR_TODOS') ? 'TODOS' : 'MIS_TICKETS');
   const [filtros, setFiltros] = useState<FiltrosTiempos>(SIN_FILTROS);
   const [monitoreo, setMonitoreo] = useState<MonitoreoTiempos | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -125,11 +128,11 @@ export function TiemposRespuestaPage() {
         </label>
         <label>
           Desde
-          <input type="date" value={filtros.desde} max={filtros.hasta || undefined} onChange={(e) => cambiar('desde', e.target.value)} />
+          <CampoFecha value={filtros.desde} max={filtros.hasta || undefined} onChange={(v) => cambiar('desde', v)} />
         </label>
         <label>
           Hasta
-          <input type="date" value={filtros.hasta} min={filtros.desde || undefined} onChange={(e) => cambiar('hasta', e.target.value)} />
+          <CampoFecha value={filtros.hasta} min={filtros.desde || undefined} onChange={(v) => cambiar('hasta', v)} />
         </label>
         {hayFiltros && (
           <button type="button" className="seguimiento-boton" onClick={() => setFiltros(SIN_FILTROS)}>
@@ -168,8 +171,8 @@ export function TiemposRespuestaPage() {
               <strong>{monitoreo.resumen.sinPrioridad}</strong>
             </div>
             <div className="seguimiento-tarjeta">
-              <span>Promedio (h)</span>
-              <strong>{formatearHoras(monitoreo.resumen.promedioHoras)}</strong>
+              <span>Tiempo promedio</span>
+              <strong>{formatearDuracion(monitoreo.resumen.promedioHoras)}</strong>
             </div>
           </div>
 
@@ -189,8 +192,8 @@ export function TiemposRespuestaPage() {
                   <th>Número</th>
                   <th>Título</th>
                   <th>Prioridad</th>
-                  <th>Objetivo (h)</th>
-                  <th>Transcurrido (h)</th>
+                  <th>Objetivo</th>
+                  <th>Transcurrido</th>
                   <th>Consumido</th>
                   <th>Cumplimiento</th>
                 </tr>
@@ -204,11 +207,11 @@ export function TiemposRespuestaPage() {
                       {item.cumplimiento === 'SIN_PRIORIDAD' && <div>Debe priorizarse</div>}
                     </td>
                     <td>{item.ticket.prioridad?.nivel ?? 'Sin prioridad'}</td>
-                    <td>{item.horasObjetivo ?? '—'}</td>
+                    <td>{item.horasObjetivo !== null ? `${item.horasObjetivo} h` : '—'}</td>
                     <td>
-                      {formatearHoras(item.horasTranscurridas)} {item.atendido ? '(hasta la primera atención)' : '(sin atender)'}
+                      {formatearDuracion(item.horasTranscurridas)} {item.atendido ? '(hasta la primera atención)' : '(sin atender)'}
                     </td>
-                    <td>{item.porcentajeConsumido !== null ? `${formatearHoras(item.porcentajeConsumido)} %` : '—'}</td>
+                    <td>{item.porcentajeConsumido !== null ? `${formatearPorcentaje(item.porcentajeConsumido)} %` : '—'}</td>
                     <td>
                       <span className={`cumplimiento-badge cumplimiento-${item.cumplimiento.toLowerCase()}`}>
                         {NOMBRE_CUMPLIMIENTO[item.cumplimiento]}

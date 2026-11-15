@@ -15,6 +15,8 @@ import type {
 import { TicketEstadoBadge } from '../components/TicketEstadoBadge';
 import './Seguimiento.css';
 
+import { CampoFecha } from '../components/CampoFecha';
+import { formatearFechaHora } from '../utils/fechas';
 const ESTADOS: { codigo: TicketEstadoCodigo; nombre: string }[] = [
   { codigo: 'NUEVO', nombre: 'Nuevo' },
   { codigo: 'PENDIENTE_CORRECCION', nombre: 'Pendiente de corrección' },
@@ -150,11 +152,11 @@ export function OperativosPage() {
         )}
         <label>
           Desde
-          <input type="date" value={filtros.desde} max={filtros.hasta || undefined} onChange={(e) => cambiar('desde', e.target.value)} />
+          <CampoFecha value={filtros.desde} max={filtros.hasta || undefined} onChange={(v) => cambiar('desde', v)} />
         </label>
         <label>
           Hasta
-          <input type="date" value={filtros.hasta} min={filtros.desde || undefined} onChange={(e) => cambiar('hasta', e.target.value)} />
+          <CampoFecha value={filtros.hasta} min={filtros.desde || undefined} onChange={(v) => cambiar('hasta', v)} />
         </label>
         {hayFiltros && (
           <button type="button" className="seguimiento-boton" onClick={() => setFiltros(SIN_FILTROS)}>
@@ -220,7 +222,7 @@ export function OperativosPage() {
                 </td>
                 <td>{ticket.prioridad?.nivel ?? '—'}</td>
                 <td>{ticket.operador ? `${ticket.operador.nombre} ${ticket.operador.apellido}` : 'Sin asignar'}</td>
-                <td>{new Date(ticket.fechaUltimaActualizacion ?? ticket.fechaCreacion).toLocaleString()}</td>
+                <td>{formatearFechaHora(ticket.fechaUltimaActualizacion ?? ticket.fechaCreacion)}</td>
               </tr>
             ))}
           </tbody>

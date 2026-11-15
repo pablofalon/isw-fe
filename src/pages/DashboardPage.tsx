@@ -4,6 +4,8 @@ import { consultarIndicadores } from '../api/reportes';
 import type { Distribucion, Indicadores } from '../types/reporte';
 import './Reportes.css';
 
+import { CampoFecha } from '../components/CampoFecha';
+import { formatearDuracion, formatearFecha } from '../utils/fechas';
 /** Fecha local yyyy-mm-dd, el formato de un input type="date". */
 function formatoDia(fecha: Date): string {
   const mes = String(fecha.getMonth() + 1).padStart(2, '0');
@@ -90,11 +92,11 @@ export function DashboardPage() {
       <form className="reportes-form" onSubmit={actualizar}>
         <label>
           Desde
-          <input type="date" value={desde} onChange={(e) => setDesde(e.target.value)} />
+          <CampoFecha value={desde} onChange={setDesde} />
         </label>
         <label>
           Hasta
-          <input type="date" value={hasta} onChange={(e) => setHasta(e.target.value)} />
+          <CampoFecha value={hasta} onChange={setHasta} />
         </label>
         <button type="submit" className="reportes-boton" disabled={cargando}>
           {cargando ? 'Calculando...' : 'Actualizar'}
@@ -115,7 +117,7 @@ export function DashboardPage() {
       {indicadores !== null && (
         <>
           <p className="reportes-aviso">
-            Tickets creados entre el {indicadores.desde} y el {indicadores.hasta}.
+            Tickets creados entre el {formatearFecha(indicadores.desde)} y el {formatearFecha(indicadores.hasta)}.
             {indicadores.sinDatos && ' No hay tickets en este período.'}
           </p>
           <div className="dashboard-resumen">
@@ -133,7 +135,7 @@ export function DashboardPage() {
             </div>
             <div className="dashboard-tarjeta">
               <span>Resolución promedio (h)</span>
-              <strong>{indicadores.promedioResolucionHoras.toLocaleString('es-AR', { maximumFractionDigits: 2 })}</strong>
+              <strong>{formatearDuracion(indicadores.promedioResolucionHoras)}</strong>
             </div>
           </div>
           <div className="dashboard-paneles">

@@ -1,6 +1,7 @@
 import { ApiError, apiFetch, queryString } from './http';
 import type { ConsultaReporte, FormatoExportacion, Indicadores, Reporte } from '../types/reporte';
 
+import { formatearFechaArchivo } from '../utils/fechas';
 const EXTENSIONES: Record<FormatoExportacion, string> = { PDF: 'pdf', EXCEL: 'xlsx', CSV: 'csv' };
 
 // CU20 - Generar reportes
@@ -33,6 +34,6 @@ export async function exportarReporte(
   const disposicion = response.headers.get('Content-Disposition') ?? '';
   const nombre =
     /filename="?([^";]+)"?/.exec(disposicion)?.[1] ??
-    `reporte-tickets-${new Date().toISOString().slice(0, 10)}.${EXTENSIONES[formato]}`;
+    `reporte-tickets-${formatearFechaArchivo(new Date())}.${EXTENSIONES[formato]}`;
   return { blob: await response.blob(), nombre };
 }

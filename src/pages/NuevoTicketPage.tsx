@@ -8,6 +8,7 @@ import { IconCheck } from '../components/icons';
 import type { Categoria, LimitesAdjuntos, Prioridad, Ticket } from '../types/ticket';
 import './NuevoTicketPage.css';
 
+import { formatearFechaHora } from '../utils/fechas';
 export function NuevoTicketPage() {
   const { token } = useAuth();
   const [creado, setCreado] = useState<Ticket | null>(null);
@@ -57,7 +58,7 @@ export function NuevoTicketPage() {
         <dl className="nuevo-ticket-confirmacion-datos">
           <div>
             <dt>Fecha y hora de creación</dt>
-            <dd>{new Date(creado.fechaCreacion).toLocaleString()}</dd>
+            <dd>{formatearFechaHora(creado.fechaCreacion)}</dd>
           </div>
           <div>
             <dt>Resumen</dt>

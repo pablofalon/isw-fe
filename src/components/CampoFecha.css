@@ -1,0 +1,44 @@
+.campo-fecha {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.campo-fecha .campo-fecha-texto {
+  width: 11em;
+  box-sizing: border-box;
+  padding-right: 32px;
+}
+
+.campo-fecha-invalida .campo-fecha-texto {
+  border-color: var(--color-danger);
+  outline-color: var(--color-danger);
+}
+
+.campo-fecha .campo-fecha-boton {
+  position: absolute;
+  right: 4px;
+  display: inline-flex;
+  padding: 4px;
+  border: none;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.campo-fecha .campo-fecha-boton:hover {
+  color: var(--color-primary);
+}
+
+/* Calendario nativo: invisible, solo se abre desde el botón. */
+.campo-fecha .campo-fecha-selector {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}

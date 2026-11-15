@@ -13,6 +13,7 @@ import type { Usuario } from '../types/usuario';
 import './BandejaPage.css';
 import './UsuariosPage.css';
 
+import { formatearFechaHora } from '../utils/fechas';
 const TIPOS: { id: Rol; label: string }[] = [
   { id: 'USUARIO', label: 'Usuario' },
   { id: 'OPERADOR', label: 'Operador' },
@@ -150,7 +151,7 @@ export function UsuariosPage() {
                   <td>
                     <EstadoBadge usuario={u} />
                   </td>
-                  <td>{u.fechaUltimoAcceso ? new Date(u.fechaUltimoAcceso).toLocaleString() : '—'}</td>
+                  <td>{u.fechaUltimoAcceso ? formatearFechaHora(u.fechaUltimoAcceso) : '—'}</td>
                   <td className="usuarios-acciones">
                     <button type="button" onClick={() => setEditor({ modo: 'edicion', usuario: u })}>
                       Editar

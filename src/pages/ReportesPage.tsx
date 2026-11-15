@@ -7,6 +7,8 @@ import type { ConsultaReporte, CriterioAgrupamiento, FormatoExportacion, Reporte
 import { IconFile } from '../components/icons';
 import './Reportes.css';
 
+import { CampoFecha } from '../components/CampoFecha';
+import { formatearDuracion, formatearFecha } from '../utils/fechas';
 const CRITERIOS: { codigo: CriterioAgrupamiento; nombre: string }[] = [
   { codigo: 'CATEGORIA', nombre: 'Categoría' },
   { codigo: 'PRIORIDAD', nombre: 'Prioridad' },
@@ -49,9 +51,7 @@ function consultaInicial(): ConsultaReporte {
   };
 }
 
-function formatearHoras(horas: number | null): string {
-  return horas === null ? '—' : horas.toLocaleString('es-AR', { maximumFractionDigits: 2 });
-}
+
 
 /** CU20 - Generar reportes y CU22 - Exportar reportes (extiende al anterior). */
 export function ReportesPage() {
@@ -150,11 +150,11 @@ export function ReportesPage() {
       <form className="reportes-form" onSubmit={generar}>
         <label>
           Desde
-          <input type="date" value={consulta.desde} onChange={(e) => cambiar('desde', e.target.value)} />
+          <CampoFecha value={consulta.desde} onChange={(v) => cambiar('desde', v)} />
         </label>
         <label>
           Hasta
-          <input type="date" value={consulta.hasta} onChange={(e) => cambiar('hasta', e.target.value)} />
+          <CampoFecha value={consulta.hasta} onChange={(v) => cambiar('hasta', v)} />
         </label>
         <label>
           Agrupar por
@@ -227,7 +227,7 @@ export function ReportesPage() {
         <>
           <div className="reportes-resultado-header">
             <h3>
-              Tickets del {reporte.desde} al {reporte.hasta}, agrupados por {nombreCriterio.toLowerCase()}
+              Tickets del {formatearFecha(reporte.desde)} al {formatearFecha(reporte.hasta)}, agrupados por {nombreCriterio.toLowerCase()}
             </h3>
             <button type="button" className="reportes-boton reportes-boton-secundario" onClick={abrirDialogo}>
               <IconFile size={14} /> Exportar reporte
@@ -250,7 +250,7 @@ export function ReportesPage() {
                   <td className="reportes-numero">{grupo.cantidad}</td>
                   <td className="reportes-numero">{grupo.abiertos}</td>
                   <td className="reportes-numero">{grupo.cerrados}</td>
-                  <td className="reportes-numero">{formatearHoras(grupo.promedioResolucionHoras)}</td>
+                  <td className="reportes-numero">{formatearDuracion(grupo.promedioResolucionHoras)}</td>
                 </tr>
               ))}
             </tbody>
@@ -260,7 +260,7 @@ export function ReportesPage() {
                 <td className="reportes-numero">{reporte.totales.cantidad}</td>
                 <td className="reportes-numero">{reporte.totales.abiertos}</td>
                 <td className="reportes-numero">{reporte.totales.cerrados}</td>
-                <td className="reportes-numero">{formatearHoras(reporte.totales.promedioResolucionHoras)}</td>
+                <td className="reportes-numero">{formatearDuracion(reporte.totales.promedioResolucionHoras)}</td>
               </tr>
             </tfoot>
           </table>
