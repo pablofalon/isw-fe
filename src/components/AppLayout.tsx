@@ -15,6 +15,7 @@ import {
   IconLogo,
   IconLogout,
   IconPlus,
+  IconSettings,
   IconShield,
   IconTicket,
   IconUser,
@@ -106,6 +107,12 @@ export function AppLayout() {
             <NavLink to="/usuarios" className="app-sidebar-link">
               <IconUsers />
               Usuarios
+            </NavLink>
+          )}
+          {tienePermiso('PARAMETROS_ADMINISTRAR') && (
+            <NavLink to="/parametros" className="app-sidebar-link">
+              <IconSettings />
+              Parámetros
             </NavLink>
           )}
           {tienePermiso('SEGURIDAD_ADMINISTRAR') && (

@@ -28,5 +28,9 @@ export function HomePage() {
     return <Navigate to="/seguridad" replace />;
   }
 
+  if (tienePermiso('PARAMETROS_ADMINISTRAR')) {
+    return <Navigate to="/parametros" replace />;
+  }
+
   return <p>Tu cuenta no tiene permisos asignados. Contactá a un administrador.</p>;
 }
