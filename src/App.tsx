@@ -15,6 +15,7 @@ import { TiemposRespuestaPage } from './pages/TiemposRespuestaPage';
 import { HistorialTicketPage } from './pages/HistorialTicketPage';
 import { ReportesPage } from './pages/ReportesPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { ParametrosPage } from './pages/ParametrosPage';
 import { RUTA_CAMBIAR_PASSWORD } from './auth/rutas';
 import type { Permiso } from './types/auth';
 
@@ -102,6 +103,14 @@ function App() {
               element={
                 <RequierePermiso permiso="REPORTES_CONSULTAR">
                   <ReportesPage />
+                </RequierePermiso>
+              }
+            />
+            <Route
+              path="parametros"
+              element={
+                <RequierePermiso permiso="PARAMETROS_ADMINISTRAR">
+                  <ParametrosPage />
                 </RequierePermiso>
               }
             />

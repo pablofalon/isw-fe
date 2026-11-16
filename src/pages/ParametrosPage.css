@@ -1,0 +1,63 @@
+.parametros section {
+  background: var(--color-card);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.parametros-seccion-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.parametros-seccion-encabezado h3 {
+  margin: 0;
+}
+
+.parametros-acciones-seccion {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.parametros-numero {
+  width: 90px;
+}
+
+.parametros-ayuda {
+  color: var(--color-text-muted, #666);
+  font-size: 13px;
+  margin: 4px 0 12px;
+}
+
+.parametros-inactiva td {
+  opacity: 0.6;
+}
+
+.parametros-general {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.parametros-general:last-child {
+  border-bottom: none;
+}
+
+.parametros-general-texto {
+  flex: 1 1 280px;
+}
+
+.parametros-general-rango {
+  display: block;
+  color: var(--color-text-muted, #666);
+  font-size: 12px;
+}
