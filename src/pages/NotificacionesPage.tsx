@@ -5,6 +5,7 @@ import { EVENTO_NOTIFICACIONES, marcarLeida, marcarTodasLeidas, misNotificacione
 import type { Notificacion } from '../types/notificacion';
 import './NotificacionesPage.css';
 
+import { formatearFechaHora } from '../utils/fechas';
 export function NotificacionesPage() {
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -67,7 +68,7 @@ export function NotificacionesPage() {
               <button type="button" onClick={() => abrir(n)}>
                 <span className="notificacion-mensaje">{n.mensaje}</span>
                 <span className="notificacion-meta">
-                  {new Date(n.fechaEnvio).toLocaleString()}
+                  {formatearFechaHora(n.fechaEnvio)}
                   {n.estado !== 'LEIDA' && <span className="notificacion-badge">Nueva</span>}
                   {n.ticketId && <span className="notificacion-ver">Ver ticket →</span>}
                 </span>

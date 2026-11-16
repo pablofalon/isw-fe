@@ -6,6 +6,8 @@ import type { NivelPrioridad, Ticket, TicketEstadoCodigo } from '../types/ticket
 import { TicketEstadoBadge } from '../components/TicketEstadoBadge';
 import './MisTicketsPage.css';
 
+import { CampoFecha } from '../components/CampoFecha';
+import { formatearFechaHora } from '../utils/fechas';
 const NIVELES: NivelPrioridad[] = ['BAJA', 'MEDIA', 'ALTA', 'CRITICA'];
 
 interface Filtros {
@@ -124,11 +126,11 @@ export function MisTicketsPage() {
         </label>
         <label>
           Desde
-          <input type="date" value={filtros.desde} max={filtros.hasta || undefined} onChange={(e) => cambiar('desde', e.target.value)} />
+          <CampoFecha value={filtros.desde} max={filtros.hasta || undefined} onChange={(v) => cambiar('desde', v)} />
         </label>
         <label>
           Hasta
-          <input type="date" value={filtros.hasta} min={filtros.desde || undefined} onChange={(e) => cambiar('hasta', e.target.value)} />
+          <CampoFecha value={filtros.hasta} min={filtros.desde || undefined} onChange={(v) => cambiar('hasta', v)} />
         </label>
         {hayFiltros && (
           <button type="button" className="mis-tickets-limpiar" onClick={() => setFiltros(SIN_FILTROS)}>
@@ -168,7 +170,7 @@ export function MisTicketsPage() {
                   <TicketEstadoBadge estado={ticket.estado} />
                 </td>
                 <td>{ticket.prioridad?.nivel ?? '—'}</td>
-                <td>{new Date(ticket.fechaCreacion).toLocaleString()}</td>
+                <td>{formatearFechaHora(ticket.fechaCreacion)}</td>
               </tr>
             ))}
           </tbody>

@@ -7,6 +7,7 @@ import type { FiltrosHistorial, HistorialEstadoEntry } from '../types/ticket';
 import { HistorialTimeline } from '../components/HistorialTimeline';
 import './Seguimiento.css';
 
+import { CampoFecha } from '../components/CampoFecha';
 const ESTADOS: { codigo: FiltrosHistorial['estado']; nombre: string }[] = [
   { codigo: 'NUEVO', nombre: 'Nuevo' },
   { codigo: 'PENDIENTE_CORRECCION', nombre: 'Pendiente de corrección' },
@@ -85,11 +86,11 @@ export function HistorialTicketPage() {
         </label>
         <label>
           Desde
-          <input type="date" value={filtros.desde} max={filtros.hasta || undefined} onChange={(e) => cambiar('desde', e.target.value)} />
+          <CampoFecha value={filtros.desde} max={filtros.hasta || undefined} onChange={(v) => cambiar('desde', v)} />
         </label>
         <label>
           Hasta
-          <input type="date" value={filtros.hasta} min={filtros.desde || undefined} onChange={(e) => cambiar('hasta', e.target.value)} />
+          <CampoFecha value={filtros.hasta} min={filtros.desde || undefined} onChange={(v) => cambiar('hasta', v)} />
         </label>
         {hayFiltros && (
           <button type="button" className="seguimiento-boton" onClick={() => setFiltros(SIN_FILTROS)}>

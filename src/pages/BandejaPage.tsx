@@ -7,6 +7,7 @@ import type { Ticket } from '../types/ticket';
 import { TicketEstadoBadge } from '../components/TicketEstadoBadge';
 import './BandejaPage.css';
 
+import { formatearFecha } from '../utils/fechas';
 type Tab = 'pendientes' | 'sin-asignar' | 'mios';
 
 const TABS: { id: Tab; label: string; permiso: Permiso }[] = [
@@ -79,7 +80,7 @@ export function BandejaPage() {
                 <td>
                   {ticket.usuario.nombre} {ticket.usuario.apellido}
                 </td>
-                <td>{new Date(ticket.fechaCreacion).toLocaleDateString()}</td>
+                <td>{formatearFecha(ticket.fechaCreacion)}</td>
               </tr>
             ))}
           </tbody>

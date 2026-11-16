@@ -26,6 +26,7 @@ import { IconThumbDown, IconThumbUp, IconTrash } from '../components/icons';
 import { ApiError } from '../api/http';
 import './TicketDetallePage.css';
 
+import { formatearFechaHora } from '../utils/fechas';
 /** Estados en los que el titular puede agregar o quitar adjuntos (CU02). */
 const ESTADOS_ADJUNTOS_EDITABLES: TicketEstadoCodigo[] = ['NUEVO', 'PENDIENTE_CORRECCION', 'EN_ANALISIS'];
 
@@ -122,7 +123,7 @@ export function TicketDetallePage() {
           <div className="ticket-detalle-card">
             <h3 className="ticket-detalle-titulo">{ticket.titulo}</h3>
             <p className="ticket-detalle-meta">
-              Creado el {new Date(ticket.fechaCreacion).toLocaleString()} por {ticket.usuario.nombre}{' '}
+              Creado el {formatearFechaHora(ticket.fechaCreacion)} por {ticket.usuario.nombre}{' '}
               {ticket.usuario.apellido}
               {ticket.categoria && <> · Categoría: {ticket.categoria.nombre}</>}
               {ticket.prioridad ? (
@@ -342,7 +343,7 @@ function ClasificacionPanel({
 
   return (
     <div className="panel-operador">
-      <h4>Clasificación y priorización (CU04 / CU05 / CU06)</h4>
+      <h4>Clasificación y priorización</h4>
 
       <label>Categoría</label>
       <div className="panel-operador-fila">
@@ -433,7 +434,7 @@ function AsignacionPanel({
 
   return (
     <div className="panel-operador">
-      <h4>Asignar operador (CU13)</h4>
+      <h4>Asignar operador</h4>
       {area && delArea.length === 0 && (
         <p className="panel-operador-hint">
           No hay operadores activos del área <strong>{area}</strong>. Se muestran todos los operadores activos.
@@ -481,7 +482,7 @@ function ReasignacionPanel({
 
   return (
     <div className="panel-operador">
-      <h4>Reasignar operador (CU14)</h4>
+      <h4>Reasignar operador</h4>
       <div className="panel-operador-fila">
         <select value={idOperador} onChange={(e) => setIdOperador(e.target.value)}>
           <option value="">Nuevo operador responsable</option>
@@ -530,21 +531,21 @@ function ReenviarPanel({
 }
 
 /** Qué pide cada estado destino de CU07 y a qué caso de uso corresponde. */
-const DESTINOS_CU07: Partial<Record<TicketEstadoCodigo, { opcion: string; etiqueta: string; placeholder: string; boton: string }>> = {
+const DESTINOS_ESTADO: Partial<Record<TicketEstadoCodigo, { opcion: string; etiqueta: string; placeholder: string; boton: string }>> = {
   RESUELTO: {
-    opcion: 'Resuelto (CU09)',
+    opcion: 'Resuelto',
     etiqueta: 'Descripción de la resolución *',
     placeholder: 'Qué se hizo para resolver el reclamo',
     boton: 'Marcar como resuelto',
   },
   CERRADO: {
-    opcion: 'Cerrado (CU17)',
+    opcion: 'Cerrado',
     etiqueta: 'Solución aplicada *',
     placeholder: 'Solución definitiva que verá el usuario',
     boton: 'Cerrar ticket',
   },
   REABIERTO: {
-    opcion: 'Reabierto (CU19)',
+    opcion: 'Reabierto',
     etiqueta: 'Motivo de la reapertura *',
     placeholder: 'Por qué el problema persiste',
     boton: 'Reabrir ticket',
@@ -564,7 +565,7 @@ function ActualizarEstadoPanel({
   const [texto, setTexto] = useState(unico === 'CERRADO' ? (ticket.resolucion ?? '') : '');
   const [error, setError] = useState<string | null>(null);
 
-  const config = destino ? DESTINOS_CU07[destino] : undefined;
+  const config = destino ? DESTINOS_ESTADO[destino] : undefined;
   // CU09 FA2: se advierte si no hay acciones registradas (CU08), sin bloquear.
   const sinAcciones = !ticket.historialEstados.some((h) => h.tipo === 'ACCION');
 
@@ -589,7 +590,7 @@ function ActualizarEstadoPanel({
 
   return (
     <div className="panel-operador">
-      <h4>Actualizar estado (CU07)</h4>
+      <h4>Actualizar estado</h4>
       <p className="panel-operador-hint">
         Estado actual: <strong>{ticket.estadoNombre}</strong>
       </p>
@@ -598,7 +599,7 @@ function ActualizarEstadoPanel({
         {!unico && <option value="">Seleccioná el nuevo estado</option>}
         {ticket.transicionesDisponibles.map((estado) => (
           <option key={estado} value={estado}>
-            {DESTINOS_CU07[estado]?.opcion ?? estado}
+            {DESTINOS_ESTADO[estado]?.opcion ?? estado}
           </option>
         ))}
       </select>
@@ -613,7 +614,7 @@ function ActualizarEstadoPanel({
             onChange={(e) => setTexto(e.target.value)}
           />
           {destino === 'RESUELTO' && sinAcciones && (
-            <p className="panel-operador-aviso">Todavía no hay acciones registradas sobre este ticket (CU08).</p>
+            <p className="panel-operador-aviso">Todavía no hay acciones registradas sobre este ticket.</p>
           )}
           {error && <p className="panel-operador-error">{error}</p>}
           <div className="panel-operador-fila">
@@ -656,7 +657,7 @@ function RegistrarAccionPanel({
 
   return (
     <div className="panel-operador">
-      <h4>Registrar acción (CU08)</h4>
+      <h4>Registrar acción</h4>
       <label htmlFor="cu08-descripcion">Acción realizada *</label>
       <textarea
         id="cu08-descripcion"
@@ -740,7 +741,7 @@ function ComentariosPanel({
             <li key={c.id} className={c.operadorAutor ? 'comentario-operador' : 'comentario-usuario'}>
               <div className="comentario-header">
                 <strong>{autorComentario(c)}</strong>
-                <span>{new Date(c.fechaCreacion).toLocaleString()}</span>
+                <span>{formatearFechaHora(c.fechaCreacion)}</span>
               </div>
               <p>{c.contenido}</p>
             </li>
