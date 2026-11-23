@@ -1,4 +1,4 @@
-import { ApiError, apiFetch, queryString } from './http';
+import { ApiError, apiFetch, avisarSiSesionExpirada, queryString } from './http';
 import type { ConsultaReporte, FormatoExportacion, Indicadores, Reporte } from '../types/reporte';
 
 import { formatearFechaArchivo } from '../utils/fechas';
@@ -27,6 +27,7 @@ export async function exportarReporte(
   );
 
   if (!response.ok) {
+    avisarSiSesionExpirada(response.status, token);
     const errorBody = await response.json().catch(() => null);
     throw new ApiError(errorBody?.message ?? `Error ${response.status}`, response.status);
   }

@@ -97,6 +97,8 @@ test('ciclo de vida completo de un ticket', async ({ browser }) => {
   await test.step('CU18: el usuario confirma la resolución', async () => {
     await usuario.goto(`/tickets/${idTicket}`);
     await expect(usuario.getByText('¿La solución brindada resolvió su problema?')).toBeVisible();
+    // Paso 5 de CU18: el sistema pide confirmar la acción.
+    usuario.once('dialog', (dialogo) => dialogo.accept());
     await usuario.getByRole('button', { name: /Confirmar resolución/ }).click();
     await expect(usuario.getByText('Ya confirmaste esta resolución')).toBeVisible();
   });

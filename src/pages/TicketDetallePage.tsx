@@ -220,7 +220,11 @@ export function TicketDetallePage() {
                 <button
                   type="button"
                   className="ticket-detalle-validacion-confirmar"
-                  onClick={() => ejecutar(() => validarResolucion(token!, ticketId))}
+                  onClick={() => {
+                    if (window.confirm('¿Confirmás que la solución brindada resolvió tu problema?')) {
+                      void ejecutar(() => validarResolucion(token!, ticketId));
+                    }
+                  }}
                 >
                   <IconThumbUp size={22} />
                   <span>Confirmar resolución</span>

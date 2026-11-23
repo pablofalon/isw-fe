@@ -8,7 +8,8 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   const location = useLocation();
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    // Se conserva la ruta actual para volver a ella después de iniciar sesión.
+    return <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}` }} />;
   }
 
   // Con contraseña temporal la única pantalla disponible es la de cambiarla.

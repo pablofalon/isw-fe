@@ -1,12 +1,14 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { ApiError } from '../api/http';
 import './LoginPage.css';
 
 export function LoginPage() {
-  const { login } = useAuth();
+  const { login, sesionExpirada } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const rutaDeRetorno = (location.state as { from?: string } | null)?.from ?? '/';
   const [usuarioLogin, setUsuarioLogin] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +20,7 @@ export function LoginPage() {
     setSubmitting(true);
     try {
       await login(usuarioLogin, password);
-      navigate('/', { replace: true });
+      navigate(rutaDeRetorno, { replace: true });
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         setError('Usuario o contraseña incorrectos.');
@@ -58,6 +60,7 @@ export function LoginPage() {
           required
         />
 
+        {sesionExpirada && !error && <p className="login-error">Tu sesión expiró. Volvé a iniciar sesión para continuar.</p>}
         {error && <p className="login-error">{error}</p>}
 
         <button type="submit" disabled={submitting}>
