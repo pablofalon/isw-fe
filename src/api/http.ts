@@ -9,6 +9,21 @@ export class ApiError extends Error {
   }
 }
 
+type ManejadorSesionExpirada = () => void;
+let manejadorSesionExpirada: ManejadorSesionExpirada | null = null;
+
+/** El AuthProvider registra qué hacer cuando el servidor rechaza el token (sesión expirada o invalidada). */
+export function registrarManejadorSesionExpirada(manejador: ManejadorSesionExpirada | null) {
+  manejadorSesionExpirada = manejador;
+}
+
+/** Un 401 con token enviado significa que la sesión ya no es válida; sin token (login) es un error de credenciales. */
+export function avisarSiSesionExpirada(status: number, token: string | null | undefined) {
+  if (status === 401 && token) {
+    manejadorSesionExpirada?.();
+  }
+}
+
 interface RequestOptions extends Omit<RequestInit, 'body'> {
   body?: unknown;
   token?: string | null;
@@ -28,6 +43,7 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
   });
 
   if (!response.ok) {
+    avisarSiSesionExpirada(response.status, token);
     const errorBody = await response.json().catch(() => null);
     throw new ApiError(errorBody?.message ?? `Error ${response.status}`, response.status);
   }

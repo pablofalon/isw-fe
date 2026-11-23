@@ -1,6 +1,6 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import * as authApi from '../api/auth';
-import { ApiError } from '../api/http';
+import { ApiError, registrarManejadorSesionExpirada } from '../api/http';
 import type { Permiso, Rol } from '../types/auth';
 
 const STORAGE_KEY = 'sistematicket.session';
@@ -21,6 +21,8 @@ interface AuthContextValue {
   /** La UI decide qué mostrar por permiso, igual que el backend decide qué autorizar. */
   tienePermiso: (permiso: Permiso) => boolean;
   isAuthenticated: boolean;
+  /** true si la sesión se cerró porque el servidor la dio por expirada (no por un cierre voluntario). */
+  sesionExpirada: boolean;
   debeCambiarPassword: boolean;
   marcarPasswordCambiada: () => void;
   login: (usuarioLogin: string, password: string) => Promise<void>;
@@ -43,6 +45,19 @@ function readStoredSession(): StoredSession | null {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<StoredSession | null>(() => readStoredSession());
+  const [sesionExpirada, setSesionExpirada] = useState(false);
+  const cerrandoSesion = useRef(false);
+
+  // Cualquier 401 con token (sesión expirada o invalidada) cierra la sesión local: ProtectedRoute
+  // redirige al login conservando la ruta actual para volver después de ingresar.
+  useEffect(() => {
+    registrarManejadorSesionExpirada(() => {
+      if (cerrandoSesion.current) return;
+      setSesionExpirada(true);
+      setSession(null);
+    });
+    return () => registrarManejadorSesionExpirada(null);
+  }, []);
 
   useEffect(() => {
     if (session) {
@@ -54,18 +69,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function login(usuarioLogin: string, password: string) {
     const { token, rol, nombreCompleto, permisos, debeCambiarPassword } = await authApi.login({ usuarioLogin, password });
+    setSesionExpirada(false);
     setSession({ token, rol, nombreCompleto, permisos, debeCambiarPassword });
   }
 
   async function logout() {
-    if (session) {
-      try {
-        await authApi.logout(session.token);
-      } catch (error) {
-        if (!(error instanceof ApiError)) throw error;
+    cerrandoSesion.current = true;
+    try {
+      if (session) {
+        try {
+          await authApi.logout(session.token);
+        } catch (error) {
+          if (!(error instanceof ApiError)) throw error;
+        }
       }
+      setSesionExpirada(false);
+      setSession(null);
+    } finally {
+      cerrandoSesion.current = false;
     }
-    setSession(null);
   }
 
   const value: AuthContextValue = {
@@ -75,6 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     permisos: session?.permisos ?? [],
     tienePermiso: (permiso) => session?.permisos.includes(permiso) ?? false,
     isAuthenticated: session !== null,
+    sesionExpirada,
     debeCambiarPassword: session?.debeCambiarPassword ?? false,
     marcarPasswordCambiada: () => setSession((actual) => (actual ? { ...actual, debeCambiarPassword: false } : actual)),
     login,
