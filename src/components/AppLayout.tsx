@@ -136,11 +136,6 @@ export function AppLayout() {
             Ayuda
           </button>
         </nav>
-
-        <button type="button" className="app-sidebar-logout" onClick={() => logout()}>
-          <IconLogout />
-          Cerrar sesión
-        </button>
       </aside>
 
       <div className="app-body">
@@ -153,6 +148,10 @@ export function AppLayout() {
             <span className="app-topbar-avatar">
               <IconUser size={16} />
             </span>
+            <button type="button" className="app-topbar-logout" onClick={() => logout()}>
+              <IconLogout size={16} />
+              Cerrar sesión
+            </button>
           </div>
         </header>
         <main className="app-content">

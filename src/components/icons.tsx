@@ -221,6 +221,16 @@ export function IconCalendar({ size = 16 }: IconProps) {
   );
 }
 
+export function IconDownload({ size = 16 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...base}>
+      <path d="M12 4v11" />
+      <path d="M7 10l5 5 5-5" />
+      <path d="M5 20h14" />
+    </svg>
+  );
+}
+
 export function IconSettings({ size = 18 }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" {...base}>
