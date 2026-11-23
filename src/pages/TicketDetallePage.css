@@ -99,6 +99,23 @@
   font-size: 13px;
 }
 
+.ticket-detalle-adjuntos .ticket-detalle-adjunto-descargar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.ticket-detalle-adjuntos .ticket-detalle-adjunto-descargar:hover {
+  text-decoration: underline;
+}
+
 .ticket-detalle-adjunto-tamanio {
   color: var(--color-text-muted);
 }

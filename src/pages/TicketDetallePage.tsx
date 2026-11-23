@@ -7,6 +7,7 @@ import {
   asignarOperador,
   asignarPrioridad,
   clasificarTicket,
+  descargarAdjunto,
   eliminarAdjunto,
   marcarIncompleto,
   obtenerTicket,
@@ -22,7 +23,7 @@ import type { Categoria, Comentario, OperadorResumen, Prioridad, Ticket, TicketE
 import { TicketEstadoBadge } from '../components/TicketEstadoBadge';
 import { HistorialTimeline } from '../components/HistorialTimeline';
 import { ReabrirModal } from '../components/ReabrirModal';
-import { IconThumbDown, IconThumbUp, IconTrash } from '../components/icons';
+import { IconDownload, IconThumbDown, IconThumbUp, IconTrash } from '../components/icons';
 import { ApiError } from '../api/http';
 import './TicketDetallePage.css';
 
@@ -149,7 +150,20 @@ export function TicketDetallePage() {
                   {ticket.adjuntos.map((adjunto) => (
                     <li key={adjunto.id}>
                       <span>
-                        {adjunto.nombreArchivo}
+                        <button
+                          type="button"
+                          className="ticket-detalle-adjunto-descargar"
+                          title="Descargar"
+                          onClick={() => {
+                            setAccionError(null);
+                            descargarAdjunto(token!, ticketId, adjunto).catch((err) =>
+                              setAccionError(err instanceof Error ? err.message : 'No se pudo descargar el archivo.'),
+                            );
+                          }}
+                        >
+                          <IconDownload size={14} />
+                          {adjunto.nombreArchivo}
+                        </button>
                         {adjunto.operadorAutor && (
                           <span className="ticket-detalle-adjunto-evidencia">
                             evidencia de {adjunto.operadorAutor.nombre} {adjunto.operadorAutor.apellido}

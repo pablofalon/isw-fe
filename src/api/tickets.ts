@@ -1,4 +1,4 @@
-import { ApiError, apiFetch, queryString } from './http';
+import { ApiError, apiFetch, avisarSiSesionExpirada, queryString } from './http';
 import type {
   Adjunto,
   CrearTicketInput,
@@ -188,6 +188,24 @@ export async function adjuntarArchivo(token: string, ticketId: number, file: Fil
 // CU02 FA3 - Eliminar adjunto
 export function eliminarAdjunto(token: string, ticketId: number, adjuntoId: number): Promise<Ticket> {
   return apiFetch<Ticket>(`/api/tickets/${ticketId}/adjuntos/${adjuntoId}`, { method: 'DELETE', token });
+}
+
+/** Descarga un adjunto con el token de la sesión y lo guarda en el equipo con su nombre original. */
+export async function descargarAdjunto(token: string, ticketId: number, adjunto: Adjunto): Promise<void> {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tickets/${ticketId}/adjuntos/${adjunto.id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) {
+    avisarSiSesionExpirada(response.status, token);
+    const errorBody = await response.json().catch(() => null);
+    throw new ApiError(errorBody?.message ?? `Error ${response.status}`, response.status);
+  }
+  const url = URL.createObjectURL(await response.blob());
+  const enlace = document.createElement('a');
+  enlace.href = url;
+  enlace.download = adjunto.nombreArchivo;
+  enlace.click();
+  URL.revokeObjectURL(url);
 }
 
 export function limitesAdjuntos(token: string): Promise<LimitesAdjuntos> {
